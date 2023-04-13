@@ -1,0 +1,47 @@
+quicksort function (start, finish) 
+{
+  if (start == finish) 
+  {
+    return 0;
+  } 
+  else
+  {
+    //calculate the middle of the part of the array
+    middle = start + round((finish - start)/2.0;
+    //sort left half
+    i = start;
+    while (i < middle) 
+    {
+      if (array[i] > array[middle])
+      {
+        //storage = array[i];
+        leftshift(i, middle);
+        //array[middle] = storage;
+        middle--;
+      } 
+      else
+      {
+        i++;
+      }
+    }
+    i = finish;
+    while (i > middle) 
+    {
+      if (array[i] < array[middle])
+      {
+        //storage = array[i];
+        rightshift(middle, i);
+        //array[middle] = storage;
+        middle++;
+      }
+      else
+      {
+        i--;
+      }
+    }
+    
+    quicksort(start, middle);
+    quicksort(middle + 1, finish);
+  }
+}
+
