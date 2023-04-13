@@ -1,0 +1,23 @@
+//leftshift
+leftshift (start, finish) //shift every element of array between start and finish to the left, 
+                          //replacing the last element with the first
+{
+  storage = array[start];
+  for (i = start; i < finish - 1; i++) 
+  {
+    array[i] = array[i + 1];
+  }
+  array[finish] = storage;
+}
+
+
+
+leftshift (start, finish) //similar conception, but shift to the right
+{
+  storage = array[finish];
+  for (i = finish; i > start + 1; i--) 
+  {
+    array[i] = array[i - 1];
+  }
+  array[start] = storage;
+}
