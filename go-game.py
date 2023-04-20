@@ -1,3 +1,6 @@
+
+print("radio sraka")
+
 from tkinter import *
 tk = Tk()
 canvas = Canvas(tk, width=500, height=500)
@@ -21,6 +24,7 @@ class Dot:
         print(self.dots_connected)
 
     def update(self):
+
         if self.team == None:
             #erase previous
             canvas.create_rectangle(self.x*20, self.y*20, self.x*20 + 20, self.y*20 + 20, fill='#ffffff', outline='#ffffff')
@@ -234,6 +238,84 @@ def check_for_position_acceptance(x, y):
             return False
         
              
+        #draw black knot
+        canvas.create_line(self.x*20 + 10, self.y*20, self.x*20 + 10, (self.y + 1)*20, fill='#000000')
+        canvas.create_line(self.x*20, self.y*20 + 10, self.x*20 + 20, self.y*20 + 10, fill='#000000')
+        
+
+        #draw connections
+        for i in range(0, len(self.dots_connected)):
+            if self.dots_connected[i].x == self.x - 1 and self.dots_connected[i].y == self.y - 1:
+                canvas.create_line(self.x*20 + 10, self.y*20 + 10, self.x*20, self.y*20, fill=self.team.colour)#*
+                                                                                                               # @
+                                                                                                               #
+                
+            elif self.dots_connected[i].x == self.x and self.dots_connected[i].y == self.y - 1:
+                canvas.create_line(self.x*20 + 10, self.y*20 + 10, self.x*20 + 10, self.y*20, fill=self.team.colour)# *
+                                                                                                                    # @
+                                                                                                                    #
+            
+            elif self.dots_connected[i].x == self.x + 1 and self.dots_connected[i].y == self.y - 1:
+                canvas.create_line(self.x*20 + 10, self.y*20 + 10, self.x*20 + 20, self.y*20, fill=self.team.colour)#  *
+                                                                                                                    # @
+                                                                                                                    #
+
+            elif self.dots_connected[i].x == self.x + 1 and self.dots_connected[i].y == self.y:
+                canvas.create_line(self.x*20 + 10, self.y*20 + 10, self.x*20 + 20, self.y*20 + 10, fill=self.team.colour)#
+                                                                                                                         # @*
+                                                                                                                         #
+
+            elif self.dots_connected[i].x == self.x + 1 and self.dots_connected[i].y == self.y + 1:
+                canvas.create_line(self.x*20 + 10, self.y*20 + 10, self.x*20 + 20, self.y*20 + 20, fill=self.team.colour)#
+                                                                                                                         # @
+                                                                                                                         #  *
+
+            elif self.dots_connected[i].x == self.x and self.dots_connected[i].y == self.y + 1:
+                canvas.create_line(self.x*20 + 10, self.y*20 + 10, self.x*20 + 10, self.y*20 + 20, fill=self.team.colour)#
+                                                                                                                         # @
+                                                                                                                         # *
+
+            elif self.dots_connected[i].x == self.x - 1 and self.dots_connected[i].y == self.y + 1:
+                canvas.create_line(self.x*20 + 10, self.y*20 + 10, self.x*20, self.y*20 + 20, fill=self.team.colour)#
+                                                                                                                    # @
+                                                                                                                    #*
+
+            elif self.dots_connected[i].x == self.x - 1 and self.dots_connected[i].y == self.y:
+                canvas.create_line(self.x*20 + 10, self.y*20 + 10, self.x*20, self.y*20 + 10, fill=self.team.colour)#
+                                                                                                                    #*@
+                                                                                                                    #
+
+        #draw dot
+        canvas.create_rectangle(self.x*20 + 7, self.y*20 + 7, self.x*20 + 13, self.y*20 + 13, fill=self.team.colour, outline=self.team.colour)
+        tk.update()
+            
+            
+            
+            
+            
+            
+                
+            
+
+        
+
+
+        
+
+    def check_for_position_acceptance(self):
+        pass
+
+    def check_for_connection_with(self, fellow_dot):
+        pass
+
+    def check_for_connection_possibility(self):
+        pass
+        #return boolean
+
+    def make_connection(self):
+        pass
+
+
 
 
 
@@ -244,6 +326,7 @@ class Player:
 
     def show_area(self):
         pass
+
 
 
     def make_connections(self, path):
@@ -339,6 +422,7 @@ class Player:
 
 
 
+
 number_of_players = 6#int(input("number of players: "))
 
 players = [Player('#ff0000', 0), Player('#00ff00', 0), Player('#0000ff', 0), Player('#bbbb00', 0), Player('#117733', 0), Player('#999999', 0)]
@@ -346,6 +430,7 @@ n_players = []
 for i in range(0, number_of_players):
     n_players.append(players[i])
 players = n_players
+
 
 
 global size_of_board
@@ -357,6 +442,14 @@ for i in range(0, size_of_board):
     row = []
     for j in range(0, size_of_board):
         dot = Dot(i, j, None, [])
+
+size_of_board = 20
+board = []
+for i in range(0, size_of_board):
+    row = []
+    for j in range(0, size_of_board):
+        dot = Dot(i, j, players[j % 6], [])
+
         row.append(dot)
 
     board.append(row)
@@ -364,6 +457,7 @@ for i in range(0, size_of_board):
 
 
 board[0][0].team = players[0]
+
 board[0][1].team = players[0]
 board[1][2].team = players[0]
 board[2][1].team = players[0]
@@ -385,3 +479,9 @@ players[1].put_dot()
 #while True:
  #   for i in range(0, len(players)):
   #      players[i].put_dot()
+
+board[1][1].dots_connected = [board[0][0], board[1][0], board[2][0], board[2][1], board[2][2], board[1][2], board[0][2], board[0][1]]
+for i in range(0, size_of_board):
+    for j in range(0, size_of_board):    
+        board[i][j].update()
+
