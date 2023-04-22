@@ -1,10 +1,9 @@
-
-print("radio sraka")
-
 from tkinter import *
 tk = Tk()
 canvas = Canvas(tk, width=500, height=500)
 canvas.pack()
+
+import time
 
 #create two-dimmensional array of objects that represent dots
 
@@ -19,12 +18,12 @@ class Dot:
         print("coordinates: ")
         print(str(self.x) + ' ' + str(self.y))
         print("team: ")
-        print(self.team)
-        print("connections: ")
-        print(self.dots_connected)
+        print(self.team.colour)
+        #print("connections: ")
+        #print(self.dots_connected)
+        print("")
 
     def update(self):
-
         if self.team == None:
             #erase previous
             canvas.create_rectangle(self.x*20, self.y*20, self.x*20 + 20, self.y*20 + 20, fill='#ffffff', outline='#ffffff')
@@ -98,17 +97,6 @@ class Dot:
         return False
 
     
-    def is_corner(self):
-        if self.x == 0 and self.y == 0:
-            return True
-        elif self.x == 0 and self.y == size_of_board - 1:
-            return True
-        elif self.x == size_of_board - 1 and self.y == size_of_board - 1:
-            return True
-        elif self.x == size_of_board - 1 and self.y == 0:
-            return True
-        else:
-            return False
     
     
     def make_connection_with(self, fellow_dot):
@@ -150,8 +138,8 @@ def check_for_position_acceptance(x, y):
             return False 
         
         #wave walkthrough
-        #will determine if the placement is acceptable by counting accessible corners
-        corners = 0
+        #will determine if the placement is acceptable by counting accessible side knots
+        sides = 0
         matrix = []
         for i in range(0, size_of_board):
             row = []
@@ -194,128 +182,59 @@ def check_for_position_acceptance(x, y):
 
 
                 if currentx > 0 and currenty > 0:
-                    if board[currentx - 1][currenty - 1].team == None and matrix[currentx - 1][currenty - 1] == False:#*
+                    if board[currentx - 1][currenty - 1].team == None and matrix[currentx - 1][currenty - 1] == False:         #*
                         if board[currentx - 1][currenty].check_for_connection_with(board[currentx][currenty - 1]) == False:    # @
-                            next_front.append(board[currentx - 1][currenty - 1])                                      #
+                            next_front.append(board[currentx - 1][currenty - 1])                                               #
                             matrix[currentx - 1][currenty - 1] = True
                             
 
                 if currentx < size_of_board - 1 and currenty > 0:
-                    if board[currentx + 1][currenty - 1].team == None and matrix[currentx + 1][currenty - 1] == False:#  *
+                    if board[currentx + 1][currenty - 1].team == None and matrix[currentx + 1][currenty - 1] == False:         #  *
                         if board[currentx][currenty - 1].check_for_connection_with(board[currentx + 1][currenty]) == False:    # @
-                            next_front.append(board[currentx + 1][currenty - 1])                                      #
+                            next_front.append(board[currentx + 1][currenty - 1])                                               #
                             matrix[currentx + 1][currenty - 1] = True
                             
 
                 if currentx < size_of_board - 1 and currenty < size_of_board - 1:
-                    if board[currentx + 1][currenty + 1].team == None and matrix[currentx + 1][currenty + 1] == False:#
+                    if board[currentx + 1][currenty + 1].team == None and matrix[currentx + 1][currenty + 1] == False:         #
                         if board[currentx + 1][currenty].check_for_connection_with(board[currentx][currenty + 1]) == False:    # @
-                            next_front.append(board[currentx + 1][currenty + 1])                                      #  *
+                            next_front.append(board[currentx + 1][currenty + 1])                                               #  *
                             matrix[currentx + 1][currenty + 1] = True
                             
 
                 if currentx > 0 and currenty < size_of_board - 1:
-                    if board[currentx - 1][currenty + 1].team == None and matrix[currentx - 1][currenty + 1] == False:#
+                    if board[currentx - 1][currenty + 1].team == None and matrix[currentx - 1][currenty + 1] == False:         #
                         if board[currentx][currenty + 1].check_for_connection_with(board[currentx - 1][currenty]) == False:    # @
-                            next_front.append(board[currentx - 1][currenty + 1])                                      #*
+                            next_front.append(board[currentx - 1][currenty + 1])                                               #*
                             matrix[currentx - 1][currenty + 1] = True
                             
 
             front = next_front
-            
-        if matrix[0][0] == True:
-            corners += 1
-        if matrix[0][size_of_board - 1] == True:
-            corners += 1
-        if matrix[size_of_board - 1][0] == True:
-            corners += 1
-        if matrix[size_of_board - 1][size_of_board - 1] == True:
-            corners += 1
-        print(corners)
-        if corners > 1:
+
+        #count the accsesible side knots
+        for i in range(0, size_of_board):
+            if matrix[0][i] == True:
+                sides += 1
+            if matrix[i][0] == True:
+                sides += 1
+            if matrix[size_of_board - 1][i] == True:
+                sides += 1
+            if matrix[i][size_of_board - 1] == True:
+                sides += 1
+        print(sides)
+        
+        if sides > size_of_board*2:
             return True
         else:
             return False
         
              
-        #draw black knot
-        canvas.create_line(self.x*20 + 10, self.y*20, self.x*20 + 10, (self.y + 1)*20, fill='#000000')
-        canvas.create_line(self.x*20, self.y*20 + 10, self.x*20 + 20, self.y*20 + 10, fill='#000000')
-        
 
-        #draw connections
-        for i in range(0, len(self.dots_connected)):
-            if self.dots_connected[i].x == self.x - 1 and self.dots_connected[i].y == self.y - 1:
-                canvas.create_line(self.x*20 + 10, self.y*20 + 10, self.x*20, self.y*20, fill=self.team.colour)#*
-                                                                                                               # @
-                                                                                                               #
-                
-            elif self.dots_connected[i].x == self.x and self.dots_connected[i].y == self.y - 1:
-                canvas.create_line(self.x*20 + 10, self.y*20 + 10, self.x*20 + 10, self.y*20, fill=self.team.colour)# *
-                                                                                                                    # @
-                                                                                                                    #
-            
-            elif self.dots_connected[i].x == self.x + 1 and self.dots_connected[i].y == self.y - 1:
-                canvas.create_line(self.x*20 + 10, self.y*20 + 10, self.x*20 + 20, self.y*20, fill=self.team.colour)#  *
-                                                                                                                    # @
-                                                                                                                    #
-
-            elif self.dots_connected[i].x == self.x + 1 and self.dots_connected[i].y == self.y:
-                canvas.create_line(self.x*20 + 10, self.y*20 + 10, self.x*20 + 20, self.y*20 + 10, fill=self.team.colour)#
-                                                                                                                         # @*
-                                                                                                                         #
-
-            elif self.dots_connected[i].x == self.x + 1 and self.dots_connected[i].y == self.y + 1:
-                canvas.create_line(self.x*20 + 10, self.y*20 + 10, self.x*20 + 20, self.y*20 + 20, fill=self.team.colour)#
-                                                                                                                         # @
-                                                                                                                         #  *
-
-            elif self.dots_connected[i].x == self.x and self.dots_connected[i].y == self.y + 1:
-                canvas.create_line(self.x*20 + 10, self.y*20 + 10, self.x*20 + 10, self.y*20 + 20, fill=self.team.colour)#
-                                                                                                                         # @
-                                                                                                                         # *
-
-            elif self.dots_connected[i].x == self.x - 1 and self.dots_connected[i].y == self.y + 1:
-                canvas.create_line(self.x*20 + 10, self.y*20 + 10, self.x*20, self.y*20 + 20, fill=self.team.colour)#
-                                                                                                                    # @
-                                                                                                                    #*
-
-            elif self.dots_connected[i].x == self.x - 1 and self.dots_connected[i].y == self.y:
-                canvas.create_line(self.x*20 + 10, self.y*20 + 10, self.x*20, self.y*20 + 10, fill=self.team.colour)#
-                                                                                                                    #*@
-                                                                                                                    #
-
-        #draw dot
-        canvas.create_rectangle(self.x*20 + 7, self.y*20 + 7, self.x*20 + 13, self.y*20 + 13, fill=self.team.colour, outline=self.team.colour)
-        tk.update()
-            
-            
-            
-            
-            
-            
-                
-            
-
-        
-
-
-        
-
-    def check_for_position_acceptance(self):
-        pass
-
-    def check_for_connection_with(self, fellow_dot):
-        pass
-
-    def check_for_connection_possibility(self):
-        pass
-        #return boolean
-
-    def make_connection(self):
-        pass
-
-
+def look_for_element(array, element):
+    for i in range(1, len(array)):
+        if array[i] == element:
+            return True
+    return False
 
 
 
@@ -328,57 +247,108 @@ class Player:
         pass
 
 
-
     def make_connections(self, path):
-        pass
-
-
-    def find_connections(self, path):
-        dot = path[len(path) - 1]
-        potential_connections = dot.dots_connected
-        if dot.x > 0 and dot.y > 0:
-            if board[dot.x - 1][dot.y - 1].team == self:
-                potential_connections.append(board[dot.x - 1][dot.y - 1])
-
-        if dot.y > 0:
-            if board[dot.x][dot.y - 1].team == self:
-                potential_connections.append(board[dot.x][dot.y - 1])
-
-        if dot.x < size_of_board - 1 and dot.y > 0:
-            if board[dot.x + 1][dot.y - 1].team == self:
-                potential_connections.append(board[dot.x + 1][dot.y - 1])
-
-        if dot.x < size_of_board - 1:
-            if board[dot.x + 1][dot.y].team == self:
-                potential_connections.append(board[dot.x + 1][dot.y])
-
-        if dot.x < size_of_board - 1 and dot.y < size_of_board - 1:
-            if board[dot.x + 1][dot.y + 1].team == self:
-                potential_connections.append(board[dot.x + 1][dot.y + 1])
-
-        if dot.y < size_of_board - 1:
-            if board[dot.x][dot.y + 1].team == self:
-                potential_connections.append(board[dot.x][dot.y + 1])
-
-        if dot.x > 0 and dot.y < size_of_board - 1:
-            if board[dot.x - 1][dot.y + 1].team == self:
-                potential_connections.append(board[dot.x - 1][dot.y + 1])
-
-        if dot.x > 0:
-            if board[dot.x - 1][dot.y].team == self:
-                potential_connections.append(board[dot.x - 1][dot.y])
+        for i in range(0, len(path) - 1):
+            path[i].dots_connected.append(path[i + 1])
+            path[i + 1].dots_connected.append(path[i])
+            
+        path[len(path) - 1].dots_connected.append(path[0])
+        path[0].dots_connected.append(path[len(path) - 1])
+        
+        for i in range(0, len(path)):
+            path[i].update()
 
 
 
-        for i in range(0, len(potential_connections)):
-            if potential_connections[i] == path[0]:
-                self.make_connections(path)
-            else:
-                new_path = path
-                new_path.append(potential_connections[i])
-                find_connections(new_path)
+    def are_connections_possible(self, start):
+        matrix = []
+        for i in range(0, size_of_board):
+            row = []
+            for i in range(0, size_of_board):
+                row.append(False)
+            matrix.append(row)
 
-    
+        
+        front = [start]
+        matrix[start.x][start.y] = True
+        while len(front) > 0:
+            vorbereitung = []
+
+            for i in range(0, len(front)):
+                for j in range(0, len(front[i].dots_connected)):
+                    if matrix[front[i].dots_connected[j].x][front[i].dots_connected[j].y] == False:
+                        vorbereitung.append(front[i].dots_connected[j])
+                        matrix[front[i].dots_connected[j].x][front[i].dots_connected[j].y] = True
+
+
+            for i in range(0, len(front)):
+                if front[i].x > 0 and front[i].y > 0:
+                    if matrix[front[i].x - 1][front[i].y - 1] == False and board[front[i].x - 1][front[i].y - 1].team == self:        #*
+                        if board[front[i].x][front[i].y - 1].check_for_connection_with(board[front[i].x - 1][front[i].y]) == False:   # @
+                            vorbereitung.append(board[front[i].x - 1][front[i].y - 1])                                                #
+                            matrix[front[i].x - 1][front[i].y - 1] = True
+
+                if front[i].y > 0:
+                    if matrix[front[i].x][front[i].y - 1] == False and board[front[i].x][front[i].y - 1].team == self:# *
+                        vorbereitung.append(board[front[i].x][front[i].y - 1])                                        # @
+                        matrix[front[i].x][front[i].y - 1] = True                                                     #
+
+                if front[i].x < size_of_board - 1 and front[i].y > 0:
+                    if matrix[front[i].x + 1][front[i].y - 1] == False and board[front[i].x + 1][front[i].y - 1].team == self:         #  *
+                        if board[front[i].x][front[i].y - 1].check_for_connection_with(board[front[i].x + 1][front[i].y]) == False:    # @
+                            vorbereitung.append(board[front[i].x + 1][front[i].y - 1])                                                 #
+                            matrix[front[i].x + 1][front[i].y - 1] = True
+
+                if front[i].x < size_of_board - 1:
+                    if matrix[front[i].x + 1][front[i].y] == False and board[front[i].x + 1][front[i].y].team == self:#
+                        vorbereitung.append(board[front[i].x + 1][front[i].y])                                        # @*
+                        matrix[front[i].x + 1][front[i].y] = True                                                     #
+            
+                if front[i].x < size_of_board - 1 and front[i].y < size_of_board - 1:
+                    if matrix[front[i].x + 1][front[i].y + 1] == False and board[front[i].x + 1][front[i].y + 1].team == self:         #
+                        if board[front[i].x][front[i].y + 1].check_for_connection_with(board[front[i].x + 1][front[i].y]) == False:    # @
+                            vorbereitung.append(board[front[i].x + 1][front[i].y + 1])                                                 #  *
+                            matrix[front[i].x + 1][front[i].y + 1] = True
+
+                if front[i].y < size_of_board - 1:
+                    if matrix[front[i].x][front[i].y + 1] == False and board[front[i].x][front[i].y + 1].team == self:#
+                        vorbereitung.append(board[front[i].x][front[i].y + 1])                                        # @
+                        matrix[front[i].x][front[i].y + 1] = True                                                     # *
+
+                if front[i].x > 0 and front[i].y < size_of_board - 1:
+                    if matrix[front[i].x - 1][front[i].y + 1] == False and board[front[i].x - 1][front[i].y + 1].team == self:         #
+                        if board[front[i].x][front[i].y + 1].check_for_connection_with(board[front[i].x - 1][front[i].y]) == False:    # @
+                            vorbereitung.append(board[front[i].x - 1][front[i].y + 1])                                                 #*
+                            matrix[front[i].x - 1][front[i].y + 1] = True
+
+                if front[i].x > 0:
+                    if matrix[front[i].x - 1][front[i].y] == False and board[front[i].x - 1][front[i].y].team == self:#
+                        vorbereitung.append(board[front[i].x - 1][front[i].y])                                        #*@
+                        matrix[front[i].x - 1][front[i].y] = True                                                     #
+            
+
+
+            for i in range(0, len(vorbereitung)):
+                for j in range(0, len(vorbereitung)):
+                    if i != j:
+                        if abs(vorbereitung[i].x - vorbereitung[j].x) < 2 and abs(vorbereitung[i].y - vorbereitung[j].y) < 2:
+                            print('found')
+                            return
+                for j in range(0, len(front)):
+                    for k in range(0, len(front)):
+                        if j != k:
+                            if abs(vorbereitung[i].x - front[j].x) < 2 and abs(vorbereitung[i].y - front[j].y) < 2:
+                                if abs(vorbereitung[i].x - front[k].x) < 2 and abs(vorbereitung[i].y - front[k].y) < 2:
+                                    print('found in other way')
+                                    return 
+                                    
+                        
+            
+            front = vorbereitung
+
+
+            
+                
 
 
 
@@ -414,23 +384,19 @@ class Player:
         dot.move(-1, -1)
         board[x][y] = Dot(x, y, self, [])
         board[x][y].update()
-
-        
-        
+        #self.find_connections(board[x][y])
 
 
 
 
 
-
-number_of_players = 6#int(input("number of players: "))
+number_of_players = 2#int(input("number of players: "))
 
 players = [Player('#ff0000', 0), Player('#00ff00', 0), Player('#0000ff', 0), Player('#bbbb00', 0), Player('#117733', 0), Player('#999999', 0)]
 n_players = []
 for i in range(0, number_of_players):
     n_players.append(players[i])
 players = n_players
-
 
 
 global size_of_board
@@ -442,46 +408,29 @@ for i in range(0, size_of_board):
     row = []
     for j in range(0, size_of_board):
         dot = Dot(i, j, None, [])
-
-size_of_board = 20
-board = []
-for i in range(0, size_of_board):
-    row = []
-    for j in range(0, size_of_board):
-        dot = Dot(i, j, players[j % 6], [])
-
         row.append(dot)
 
     board.append(row)
 
 
 
-board[0][0].team = players[0]
-
-board[0][1].team = players[0]
-board[1][2].team = players[0]
-board[2][1].team = players[0]
+#board[0][0].team = players[0]
 board[1][0].team = players[0]
+board[2][1].team = players[0]
+board[1][2].team = players[0]
+board[0][1].team = players[0]
 
-board[0][0].dots_connected = [board[0][1], board[1][0]]
-board[0][1].dots_connected = [board[0][0], board[1][2]]
-board[1][2].dots_connected = [board[0][1], board[2][1]]
-board[2][1].dots_connected = [board[1][2], board[1][0]]
-board[1][0].dots_connected = [board[2][1], board[0][0]]
 
-#board[1][1].dots_connected = [board[0][0], board[1][0], board[2][0], board[2][1], board[2][2], board[1][2], board[0][2], board[0][1]]
 for i in range(0, size_of_board):
     for j in range(0, size_of_board):    
         board[i][j].update()
 
-players[1].put_dot()
 
+players[0].are_connections_possible(board[1][0])
+
+
+#players[1].put_dot()
+time.sleep(5)
 #while True:
  #   for i in range(0, len(players)):
   #      players[i].put_dot()
-
-board[1][1].dots_connected = [board[0][0], board[1][0], board[2][0], board[2][1], board[2][2], board[1][2], board[0][2], board[0][1]]
-for i in range(0, size_of_board):
-    for j in range(0, size_of_board):    
-        board[i][j].update()
-
