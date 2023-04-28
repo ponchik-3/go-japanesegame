@@ -312,10 +312,10 @@ class Player:
         start.printme()
         finish.printme()
         
-        path = []
+        
         
         connections_pretendents = []
-        path.append(start)
+        
        
         matrix = []
         for i in range(0, size_of_board):
@@ -324,6 +324,7 @@ class Player:
                 row.append(False)
             matrix.append(row)
         matrix[start.x][start.y] = True
+        matrix[finish.x][finish.y] = True
 
 
         def keinenamenahnungen(path):
@@ -331,29 +332,32 @@ class Player:
 
             neighbours = current.get_accessible_neighbours()
             for i in range(0, len(neighbours)):
-                if matrix[neighbours[i].x][neighbours[i].y] == False:
-                    if neighbours[i].x == finish.x and neighbours[i].y == finish.y:
-                        connections_pretendents.append(path)
+                 
+                if neighbours[i].x == finish.x and neighbours[i].y == finish.y:
+                    connections_pretendents.append(path)
+                    #return
 
-                    else:
-                        matrix[neighbours[i].x][neighbours[i].y] = True
-                        new_path = path
-                        new_path.append(neighbours[i])
-                        keinenamenahnungen(new_path)
+                if matrix[neighbours[i].x][neighbours[i].y] == False:
+                    matrix[neighbours[i].x][neighbours[i].y] = True
+                    new_path = path
+                    new_path.append(neighbours[i])
+                    keinenamenahnungen(new_path)
+                    
         
-        keinenamenahnungen(path)
+        keinenamenahnungen([start])
+        #print('aaaaaaaaaaaaaaaa')
         for i in range(0, len(connections_pretendents)):
-            print('another path')
+            #print('pathhhhhhhhhhhhhhhhhh')
             connections_pretendents[i].append(finish)
             for j in range(0, len(connections_pretendents[i])):
                 connections_pretendents[i][j].printme()
 
-        maxindex = -1
         maxlen = 0
+        maxindex = -1
         for i in range(0, len(connections_pretendents)):
             if len(connections_pretendents[i]) > maxlen:
-                maxlen = len(connections_pretendents[i])
                 maxindex = i
+                maxlen = len(connections_pretendents[i])
         
         self.make_connections(connections_pretendents[maxindex])
 
@@ -551,7 +555,7 @@ for i in range(0, size_of_board):
     for j in range(0, size_of_board):    
         board[i][j].update()
 
-#players[0].are_connections_possible(board[0][1])
+#players[0].are_connections_possible(board[3][1])
 
 
 #players[1].put_dot()
