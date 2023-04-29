@@ -137,7 +137,56 @@ class Dot:
         return neighbours
 
 
-    
+    def wavefunction(self):
+        matrix = []
+        for i in range(0, size_of_board):
+            row = []
+            for j in range(0, size_of_board):
+                row.append(False)
+            matrix.append(row)
+
+        
+        front = [self]
+        matrix[self.x][self.y] = True
+        #wave walkthrough
+        #connections are possible if the wave will be widenned and then narrowed to one point
+        
+        while len(front) > 0:
+            vorbereitung = []
+
+            
+
+            for i in range(0, len(front)):
+
+                neighbours = front[i].get_accessible_neighbours()
+                for j in range(0, len(neighbours)):
+                    if matrix[neighbours[j].x][neighbours[j].y] == False:
+                        vorbereitung.append(board[neighbours[j].x][neighbours[j].y])
+                        matrix[neighbours[j].x][neighbours[j].y] = True
+
+        
+
+            for i in range(0, len(vorbereitung)):
+                for j in range(0, len(vorbereitung)):
+                    if i != j:
+                        if abs(vorbereitung[i].x - vorbereitung[j].x) < 2 and abs(vorbereitung[i].y - vorbereitung[j].y) < 2:
+                            if vorbereitung[i].check_for_connection_with(vorbereitung[j]) == False:
+                                print('found')
+                                self.team.find_connections(vorbereitung[i], vorbereitung[j])
+                                return
+                for j in range(0, len(front)):
+                    for k in range(0, len(front)):
+                        if j != k:
+                            if abs(vorbereitung[i].x - front[j].x) < 2 and abs(vorbereitung[i].y - front[j].y) < 2:
+                                if abs(vorbereitung[i].x - front[k].x) < 2 and abs(vorbereitung[i].y - front[k].y) < 2:
+                                    if vorbereitung[i].check_for_connection_with(front[j]) == False and vorbereitung[i].check_for_connection_with(front[k]) == False:
+                                        print('found in other way')
+                                        self.team.find_connections(vorbereitung[i], front[k])
+                                        return 
+                                    
+                        
+            
+            front = vorbereitung
     
     
     def make_connection_with(self, fellow_dot):
@@ -371,6 +420,9 @@ class Player:
 
 
     def are_connections_possible(self, start):
+        #wave walkthrough
+        #create a list of all potentially accessible dots from start
+        #then complete another wave walkthrough for each
         matrix = []
         for i in range(0, size_of_board):
             row = []
@@ -378,85 +430,28 @@ class Player:
                 row.append(False)
             matrix.append(row)
 
-        
+        wave = []
         front = [start]
+        wave.append(front)
         matrix[start.x][start.y] = True
-        #wave walkthrough
-        #connections are possible if the wave will be widenned and then narrowed to one point
-        #refactor using .get_accessible_neighbours function
+
         while len(front) > 0:
             vorbereitung = []
-
-            
-
             for i in range(0, len(front)):
-                if front[i].x > 0 and front[i].y > 0:
-                    if matrix[front[i].x - 1][front[i].y - 1] == False and board[front[i].x - 1][front[i].y - 1].team == self:        #*
-                        if board[front[i].x][front[i].y - 1].check_for_connection_with(board[front[i].x - 1][front[i].y]) == False:   # @
-                            vorbereitung.append(board[front[i].x - 1][front[i].y - 1])                                                #
-                            matrix[front[i].x - 1][front[i].y - 1] = True
+                neighbours = front[i].get_accessible_neighbours()
 
-                if front[i].y > 0:
-                    if matrix[front[i].x][front[i].y - 1] == False and board[front[i].x][front[i].y - 1].team == self:# *
-                        vorbereitung.append(board[front[i].x][front[i].y - 1])                                        # @
-                        matrix[front[i].x][front[i].y - 1] = True                                                     #
+                for j in range(0, len(neighbours)):
+                    if matrix[neighbours[j].x][neighbours[j].y] == False:
+                        vorbereitung.append(board[neighbours[j].x][neighbours[j].y])
+                        matrix[neighbours[j].x][neighbours[j].y] = True
 
-                if front[i].x < size_of_board - 1 and front[i].y > 0:
-                    if matrix[front[i].x + 1][front[i].y - 1] == False and board[front[i].x + 1][front[i].y - 1].team == self:         #  *
-                        if board[front[i].x][front[i].y - 1].check_for_connection_with(board[front[i].x + 1][front[i].y]) == False:    # @
-                            vorbereitung.append(board[front[i].x + 1][front[i].y - 1])                                                 #
-                            matrix[front[i].x + 1][front[i].y - 1] = True
-
-                if front[i].x < size_of_board - 1:
-                    if matrix[front[i].x + 1][front[i].y] == False and board[front[i].x + 1][front[i].y].team == self:#
-                        vorbereitung.append(board[front[i].x + 1][front[i].y])                                        # @*
-                        matrix[front[i].x + 1][front[i].y] = True                                                     #
-            
-                if front[i].x < size_of_board - 1 and front[i].y < size_of_board - 1:
-                    if matrix[front[i].x + 1][front[i].y + 1] == False and board[front[i].x + 1][front[i].y + 1].team == self:         #
-                        if board[front[i].x][front[i].y + 1].check_for_connection_with(board[front[i].x + 1][front[i].y]) == False:    # @
-                            vorbereitung.append(board[front[i].x + 1][front[i].y + 1])                                                 #  *
-                            matrix[front[i].x + 1][front[i].y + 1] = True
-
-                if front[i].y < size_of_board - 1:
-                    if matrix[front[i].x][front[i].y + 1] == False and board[front[i].x][front[i].y + 1].team == self:#
-                        vorbereitung.append(board[front[i].x][front[i].y + 1])                                        # @
-                        matrix[front[i].x][front[i].y + 1] = True                                                     # *
-
-                if front[i].x > 0 and front[i].y < size_of_board - 1:
-                    if matrix[front[i].x - 1][front[i].y + 1] == False and board[front[i].x - 1][front[i].y + 1].team == self:         #
-                        if board[front[i].x][front[i].y + 1].check_for_connection_with(board[front[i].x - 1][front[i].y]) == False:    # @
-                            vorbereitung.append(board[front[i].x - 1][front[i].y + 1])                                                 #*
-                            matrix[front[i].x - 1][front[i].y + 1] = True
-
-                if front[i].x > 0:
-                    if matrix[front[i].x - 1][front[i].y] == False and board[front[i].x - 1][front[i].y].team == self:#
-                        vorbereitung.append(board[front[i].x - 1][front[i].y])                                        #*@
-                        matrix[front[i].x - 1][front[i].y] = True                                                     #
-            
-
-
-            for i in range(0, len(vorbereitung)):
-                for j in range(0, len(vorbereitung)):
-                    if i != j:
-                        if abs(vorbereitung[i].x - vorbereitung[j].x) < 2 and abs(vorbereitung[i].y - vorbereitung[j].y) < 2:
-                            if vorbereitung[i].check_for_connection_with(vorbereitung[j]) == False:
-                                print('found')
-                                self.find_connections(vorbereitung[i], vorbereitung[j])
-                                return
-                for j in range(0, len(front)):
-                    for k in range(0, len(front)):
-                        if j != k:
-                            if abs(vorbereitung[i].x - front[j].x) < 2 and abs(vorbereitung[i].y - front[j].y) < 2:
-                                if abs(vorbereitung[i].x - front[k].x) < 2 and abs(vorbereitung[i].y - front[k].y) < 2:
-                                    if vorbereitung[i].check_for_connection_with(front[j]) == False or vorbereitung[i].check_for_connection_with(front[k]) == False:
-                                        print('found in other way')
-                                        self.find_connections(vorbereitung[i], front[k])
-                                        return 
-                                    
-                        
-            
             front = vorbereitung
+            wave.append(front)
+
+
+        for i in range(0, len(wave)):
+            for j in range(0, len(wave[i])):
+                wave[i][j].wavefunction()
 
 
             
@@ -466,11 +461,11 @@ class Player:
 
     def put_dot(self):
         dot = Temporary_dot(-1, -1)
-        response = 'no'
+        response = '-'
 
         x = -1
         y = -1
-        while response == 'no' or check_for_position_acceptance(x, y) == False:
+        while response == '-' or check_for_position_acceptance(x, y) == False:
             print('player ' + self.interface_colour)
             print("write the coordinates where you want to place the dot")
             x = int(input('x: '))
@@ -485,16 +480,16 @@ class Player:
             dot.move(x, y)
             
             print('validate your dot')
-            print('if you are sure, type "yes", else type "no"')
+            print('if you are sure, press "enter", else type "-"')
             print('if you want to quit the game, type "quit"')
             response = input('')
             if response == 'quit':
                 return 'schmetterling'
             
-            while response != 'yes' and response != 'no':
-                print('you have to type "yes" or "no"')
+            while response != '' and response != '-':
+                print('you have to press "enter" or type "-"')
                 print('validate your dot')
-                print('if you are sure, type "yes", else type "no"')
+                print('if you are sure, press "enter", else type "-"')
                 print('if you want to quit the game, type "quit"')
                 response = input('')
                 if response == 'quit':
