@@ -5,7 +5,6 @@ canvas.pack()
 
 import time
 
-#create two-dimmensional array of objects that represent dots
 
 class Dot:
     def __init__(self, xcoordinate, ycoordinate, team, dots_connected):
@@ -136,61 +135,15 @@ class Dot:
                                                   #
         return neighbours
 
-
-    def wavefunction(self):
-        matrix = []
-        for i in range(0, size_of_board):
-            row = []
-            for j in range(0, size_of_board):
-                row.append(False)
-            matrix.append(row)
-
-        
-        front = [self]
-        matrix[self.x][self.y] = True
-        #wave walkthrough
-        #connections are possible if the wave will be widenned and then narrowed to one point
-        
-        while len(front) > 0:
-            vorbereitung = []
-
-            
-
-            for i in range(0, len(front)):
-
-                neighbours = front[i].get_accessible_neighbours()
-                for j in range(0, len(neighbours)):
-                    if matrix[neighbours[j].x][neighbours[j].y] == False:
-                        vorbereitung.append(board[neighbours[j].x][neighbours[j].y])
-                        matrix[neighbours[j].x][neighbours[j].y] = True
-
-        
-
-            for i in range(0, len(vorbereitung)):
-                for j in range(0, len(vorbereitung)):
-                    if i != j:
-                        if abs(vorbereitung[i].x - vorbereitung[j].x) < 2 and abs(vorbereitung[i].y - vorbereitung[j].y) < 2:
-                            if vorbereitung[i].check_for_connection_with(vorbereitung[j]) == False:
-                                print('found')
-                                self.team.find_connections(vorbereitung[i], vorbereitung[j])
-                                return
-                for j in range(0, len(front)):
-                    for k in range(0, len(front)):
-                        if j != k:
-                            if abs(vorbereitung[i].x - front[j].x) < 2 and abs(vorbereitung[i].y - front[j].y) < 2:
-                                if abs(vorbereitung[i].x - front[k].x) < 2 and abs(vorbereitung[i].y - front[k].y) < 2:
-                                    if vorbereitung[i].check_for_connection_with(front[j]) == False and vorbereitung[i].check_for_connection_with(front[k]) == False:
-                                        print('found in other way')
-                                        self.team.find_connections(vorbereitung[i], front[k])
-                                        return 
-                                    
                         
             
-            front = vorbereitung
+            
     
     
-    def make_connection_with(self, fellow_dot):
-        pass
+    
+    
+    
+
 
 
 
@@ -238,7 +191,7 @@ def check_for_position_acceptance(x, y):
             matrix.append(row)
 
         front = [board[x][y]]
-        
+        connections_borders = []
         
         while len(front) > 0:
             next_front = []
@@ -329,27 +282,158 @@ def look_for_element(array, element):
 
 
 class Player:
-    def __init__(self, colour, area, interface_colour):
+    def __init__(self, colour, area_chart, interface_colour, interface_height):
         self.colour = colour
-        self.area = area
+        self.area = area_chart
         self.interface_colour = interface_colour
+        self.interface_height = interface_height
+
+
+
+    def wave_for_area(self, array_matrix, xcrdnt, ycrdnt):
+        matrix = []
+        for i in range(0, size_of_board):
+            row = []
+            for j in range(0, size_of_board):
+                row.append(False)
+            matrix.append(row)
+        matrix[xcrdnt][ycrdnt] = True
+        
+        wave = []
+        front = [board[xcrdnt][ycrdnt]]
+        wave.append(front)
+        while len(front) > 0:
+            vorbereitung = []
+            #print('new front')
+            for i in range(0, len(front)):
+                x = front[i].x
+                y = front[i].y
+                #print(str(x) + ' ' + str(y))
+                if x > 0 and y > 0:
+                    if board[x - 1][y] != self and board[x - 1][y].check_for_connection_with(board[x][y - 1]) == False:
+                        if matrix[x - 1][y - 1] == False and board[x - 1][y - 1].team != self:
+                            vorbereitung.append(board[x - 1][y - 1])
+                            matrix[x - 1][y - 1] = True
+                
+                if y > 0:
+                    if not(board[x][y - 1].team == self):
+                        if matrix[x][y - 1] == False:
+                            vorbereitung.append(board[x][y - 1])
+                            matrix[x][y - 1] = True
+                
+                if x < size_of_board - 1 and y > 0:
+                    if board[x + 1][y] != self and board[x + 1][y].check_for_connection_with(board[x][y - 1]) == False:
+                        if matrix[x + 1][y - 1] == False and board[x + 1][y - 1].team != self:
+                            vorbereitung.append(board[x + 1][y - 1])
+                            matrix[x + 1][y - 1] = True
+                
+                if x < size_of_board - 1:
+                    if not(board[x + 1][y].team == self):
+                        if matrix[x + 1][y] == False:
+                            vorbereitung.append(board[x + 1][y])
+                            matrix[x + 1][y] = True
+                
+                if x < size_of_board - 1 and y < size_of_board - 1:
+                    if board[x + 1][y] != self and board[x + 1][y].check_for_connection_with(board[x][y + 1]) == False:
+                        if matrix[x + 1][y + 1] == False and board[x + 1][y + 1].team != self:
+                            vorbereitung.append(board[x + 1][y + 1])
+                            matrix[x + 1][y + 1] = True
+                
+                if y < size_of_board - 1:
+                    if not(board[x][y + 1].team == self):
+                        if matrix[x][y + 1] == False:
+                            vorbereitung.append(board[x][y + 1])
+                            matrix[x][y + 1] = True
+                
+                if x > 0 and y < size_of_board - 1:
+                    if board[x - 1][y] != self and board[x - 1][y].check_for_connection_with(board[x][y + 1]) == False:
+                        if matrix[x - 1][y + 1] == False and board[x - 1][y + 1].team != self:
+                            vorbereitung.append(board[x - 1][y + 1])
+                            matrix[x - 1][y + 1] = True
+                
+                if x > 0:
+                    if not(board[x - 1][y].team == self):
+                        if matrix[x - 1][y] == False:
+                            vorbereitung.append(board[x - 1][y])
+                            matrix[x - 1][y] = True
+
+            
+            front = vorbereitung
+            wave.append(front)
+
+        sides = 0
+        for i in range(0, len(wave)):
+            for j in range(0, len(wave[i])):
+                if (wave[i][j].x == 0 or wave[i][j].x == size_of_board - 1) or (wave[i][j].y == 0 or wave[i][j].y == size_of_board - 1):
+                    sides += 1
+        
+        #print(sides)
+        area = 0
+        if sides < size_of_board*2:
+            
+            for i in range(0, len(wave)):
+                area += len(wave[i])
+                for j in range(0, len(wave[i])):
+                    array_matrix[wave[i][j].x][wave[i][j].y] = True
+        #print(area)
+        return area
+
+    
+    def get_area(self): 
+        matrix = []
+        for i in range(0, size_of_board):
+            row = []
+            for j in range(0, size_of_board):
+                row.append(False)
+            matrix.append(row)
+        
+        area = 0
+        i = 0
+        j = 0
+        while i < size_of_board and j < size_of_board:
+            #print(str(i) + str(j))
+            if matrix[i][j] == False and board[i][j].team != self:
+                
+                area += self.wave_for_area(matrix, i, j)
+            
+            if j == size_of_board - 1:
+                j = 0
+                i += 1
+            else:
+                j += 1
+        
+        #print(area)
+        self.area = area
+
+
 
     def show_area(self):
-        pass
+        value = self.area
+        
+
+        canvas.create_rectangle(0, self.interface_height + (1 + size_of_board)*20, 500, self.interface_height + (2 + size_of_board)*20, fill='#f0f0f0', outline='#f0f0f0')
+        text = 'area circled by player %s: ' % self.interface_colour + str(value)
+        canvas.create_text(5, size_of_board*20 + 20 + self.interface_height, text=text, fill='#000000', font=('Courier', 10), anchor='nw')
+
+
 
 
     def make_connections(self, path):
         for i in range(0, len(path) - 1):
             path[i].dots_connected.append(path[i + 1])
             path[i + 1].dots_connected.append(path[i])
-            #path[i].printme()
+            
             
         path[len(path) - 1].dots_connected.append(path[0])
         path[0].dots_connected.append(path[len(path) - 1])
-        #path[len(path) - 1].printme()
+        
         
         for i in range(0, len(path)):
             path[i].update()
+
+        self.get_area()
+        self.show_area()
+        
 
 
     def find_connections(self, start, finish):
@@ -358,8 +442,7 @@ class Player:
         #choose one that goes from start to finish and is the longest
                                                                                                                                                                         #at this point i doubt that my code is the most efficient or readable
                                                                                                                                                                         #but i don't care
-        start.printme()
-        finish.printme()
+        
         
         
         
@@ -384,7 +467,7 @@ class Player:
                  
                 if neighbours[i].x == finish.x and neighbours[i].y == finish.y:
                     connections_pretendents.append(path)
-                    #return
+                    
 
                 if matrix[neighbours[i].x][neighbours[i].y] == False:
                     matrix[neighbours[i].x][neighbours[i].y] = True
@@ -394,12 +477,11 @@ class Player:
                     
         
         keinenamenahnungen([start])
-        #print('aaaaaaaaaaaaaaaa')
+        
         for i in range(0, len(connections_pretendents)):
-            #print('pathhhhhhhhhhhhhhhhhh')
+            
             connections_pretendents[i].append(finish)
-            for j in range(0, len(connections_pretendents[i])):
-                connections_pretendents[i][j].printme()
+            
 
         maxlen = 0
         maxindex = -1
@@ -451,7 +533,11 @@ class Player:
 
         for i in range(0, len(wave)):
             for j in range(0, len(wave[i])):
-                wave[i][j].wavefunction()
+                for i1 in range(0, len(wave)):
+                    for j1 in range(0, len(wave[i1])):
+                        if i1 != i and j1 != j and abs(wave[i][j].x - wave[i1][j1].x) < 2 and abs(wave[i][j].y - wave[i1][j1].y) < 2:
+                            self.find_connections(wave[i][j], wave[i1][j1])
+                                    
 
 
             
@@ -496,10 +582,13 @@ class Player:
                     return 'schmetterling'
 
 
+        time_spent = time.time()
         dot.move(-1, -1)
         board[x][y] = Dot(x, y, self, [])
         board[x][y].update()
         self.are_connections_possible(board[x][y])
+        time_spent = time.time() - time_spent
+        print('time spent: %s' % time_spent)
         return 'ja ja arbeit arbeit'
 
 
@@ -508,19 +597,13 @@ class Player:
 
 number_of_players = 2#int(input("number of players: "))
 
-players = [Player('#ff0000', 0, 'red'), Player('#00ff00', 0, 'green'), Player('#0000ff', 0, 'blue'), Player('#bbbb00', 0, 'golden'),
-            Player('#117733', 0, 'nocolouridea'), Player('#999999', 0, 'silver')]
-
-n_players = []
-for i in range(0, number_of_players):
-    n_players.append(players[i])
-players = n_players
-
-
+#create two-dimmensional array of objects that represent dots
 global size_of_board
 size_of_board = 20
 global board
 board = []
+global process_time
+process_time = 0
 
 for i in range(0, size_of_board):
     row = []
@@ -530,6 +613,18 @@ for i in range(0, size_of_board):
 
     board.append(row)
 
+
+
+
+players = [Player('#ff0000', 0, 'red', 0), Player('#00ff00', 0, 'green', 20), Player('#0000ff', 0, 'blue', 40), 
+           Player('#bbbb00', 0, 'golden', 50),
+           Player('#117733', 0, 'nocolouridea', 60), Player('#999999', 0, 'silver', 70)]
+
+
+n_players = []
+for i in range(0, number_of_players):
+    n_players.append(players[i])
+players = n_players
 
 
 #board[0][0].team = players[0]
@@ -551,8 +646,11 @@ for i in range(0, size_of_board):
         board[i][j].update()
 
 #players[0].are_connections_possible(board[3][1])
+#print('so long')
 
-
+players[0].show_area()
+players[1].show_area()
+#players[0].get_area()
 #players[1].put_dot()
 #time.sleep(10)
 is_procrastinating_with_homework = False
@@ -561,3 +659,4 @@ while is_procrastinating_with_homework == False:
         if players[i].put_dot() == 'schmetterling':
             is_procrastinating_with_homework = True
             break
+print('Overall processor time: %s' % process_time)
