@@ -109,23 +109,23 @@ class Dot:
             if board[x][y - 1].team == self.team: # *
                 neighbours.append(board[x][y - 1])# @
                                                   #
-        if x < size_of_board and y > 0:
+        if x < size_of_board - 1 and y > 0:
             if board[x + 1][y - 1].team == self.team and board[x][y - 1].check_for_connection_with(board[x + 1][y]) == False:#  *
                 neighbours.append(board[x + 1][y - 1])                                                                       # @
                                                                                                                              #
-        if x < size_of_board:
+        if x < size_of_board - 1:
             if board[x + 1][y].team == self.team: #
                 neighbours.append(board[x + 1][y])# @*
                                                   #
-        if x < size_of_board and y < size_of_board:
+        if x < size_of_board - 1 and y < size_of_board - 1:
             if board[x + 1][y + 1].team == self.team and board[x + 1][y].check_for_connection_with(board[x][y + 1]) == False:#
                 neighbours.append(board[x + 1][y + 1])                                                                       # @
                                                                                                                              #  *
-        if y < size_of_board:
+        if y < size_of_board - 1:
             if board[x][y + 1].team == self.team: #
                 neighbours.append(board[x][y + 1])# @
                                                   # *
-        if x > 0 and y < size_of_board:
+        if x > 0 and y < size_of_board - 1:
             if board[x - 1][y + 1].team == self.team and board[x][y + 1].check_for_connection_with(board[x - 1][y]) == False:#
                 neighbours.append(board[x - 1][y + 1])                                                                       # @
                                                                                                                              #*
@@ -134,6 +134,54 @@ class Dot:
                 neighbours.append(board[x - 1][y])#*@
                                                   #
         return neighbours
+
+    def connection_possibility(self):
+        matrix = []
+        for i in range(0, size_of_board):
+            row = []
+            for j in range(0, size_of_board):
+                row.append(False)
+            matrix.append(row)
+        matrix[self.x][self.y] = True
+
+        connections = []
+
+        def suchen(current):
+            #print('new check')
+            #for i in range(0, len(connections)):
+             #   print('new con')
+              #  connections[i][0].printme()
+               # connections[i][1].printme()
+            
+            neighbours = current.get_accessible_neighbours()
+
+            for i in range(0, len(neighbours)):
+                if neighbours[i].x == self.x and neighbours[i].y == self.y:
+                    #print(look_for_element(connections, [current, self]) == False)
+                    #print(look_for_element(connections, [self, current]) == False)
+                    
+                    conn1 = False
+                    conn2 = False
+                    for j in range(0, len(connections)):
+                        if connections[j][0].x == self.x and connections[j][0].y == self.y:
+                            if connections[j][1].x == current.x and connections[j][1].y == current.y:
+                                conn1 = True
+                        if connections[j][0].x == current.x and connections[j][0].y == current.y:
+                            if connections[j][1].x == self.x and connections[j][1].y == self.y:
+                                conn2 = True
+                    
+                    #print(conn1)
+                    #print(conn2)
+                    if conn1 == False and conn2 == False:
+                        connections.append([self, current])
+                        self.team.find_connections(self, current)
+                
+                if matrix[neighbours[i].x][neighbours[i].y] == False:
+                    matrix[neighbours[i].x][neighbours[i].y] = True
+                    connections.append([current, neighbours[i]])
+                    suchen(neighbours[i])
+        
+        suchen(self)
 
                         
             
@@ -369,12 +417,15 @@ class Player:
         
         #print(sides)
         area = 0
+        for i in range(0, len(wave)):
+            for j in range(0, len(wave[i])):
+                array_matrix[wave[i][j].x][wave[i][j].y] = True
+
         if sides < size_of_board*2:
             
             for i in range(0, len(wave)):
                 area += len(wave[i])
-                for j in range(0, len(wave[i])):
-                    array_matrix[wave[i][j].x][wave[i][j].y] = True
+                
         #print(area)
         return area
 
@@ -442,7 +493,10 @@ class Player:
         #choose one that goes from start to finish and is the longest
                                                                                                                                                                         #at this point i doubt that my code is the most efficient or readable
                                                                                                                                                                         #but i don't care
-        
+        #print('start and finish')
+        #start.printme()
+        #finish.printme()
+        #print('connections pretendents')
         
         
         
@@ -467,6 +521,7 @@ class Player:
                  
                 if neighbours[i].x == finish.x and neighbours[i].y == finish.y:
                     connections_pretendents.append(path)
+                    return
                     
 
                 if matrix[neighbours[i].x][neighbours[i].y] == False:
@@ -486,6 +541,10 @@ class Player:
         maxlen = 0
         maxindex = -1
         for i in range(0, len(connections_pretendents)):
+            #print('new connection')
+            #for j in range(0, len(connections_pretendents[i])):
+             #   connections_pretendents[i][j].printme()
+
             if len(connections_pretendents[i]) > maxlen:
                 maxindex = i
                 maxlen = len(connections_pretendents[i])
@@ -533,10 +592,7 @@ class Player:
 
         for i in range(0, len(wave)):
             for j in range(0, len(wave[i])):
-                for i1 in range(0, len(wave)):
-                    for j1 in range(0, len(wave[i1])):
-                        if i1 != i and j1 != j and abs(wave[i][j].x - wave[i1][j1].x) < 2 and abs(wave[i][j].y - wave[i1][j1].y) < 2:
-                            self.find_connections(wave[i][j], wave[i1][j1])
+                wave[i][j].connection_possibility()
                                     
 
 
@@ -645,18 +701,18 @@ for i in range(0, size_of_board):
     for j in range(0, size_of_board):    
         board[i][j].update()
 
-#players[0].are_connections_possible(board[3][1])
+#players[0].are_connections_possible(board[0][0])
 #print('so long')
 
 players[0].show_area()
 players[1].show_area()
 #players[0].get_area()
 #players[1].put_dot()
-#time.sleep(10)
+#time.sleep(5)
 is_procrastinating_with_homework = False
 while is_procrastinating_with_homework == False:
     for i in range(0, len(players)):
         if players[i].put_dot() == 'schmetterling':
             is_procrastinating_with_homework = True
             break
-print('Overall processor time: %s' % process_time)
+#print('Overall processor time: %s' % process_time)
