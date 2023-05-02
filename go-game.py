@@ -512,6 +512,7 @@ class Player:
         matrix[start.x][start.y] = True
         matrix[finish.x][finish.y] = True
 
+        connections = []
 
         def keinenamenahnungen(path):
             current = path[len(path) - 1]
@@ -520,12 +521,24 @@ class Player:
             for i in range(0, len(neighbours)):
                  
                 if neighbours[i].x == finish.x and neighbours[i].y == finish.y:
-                    connections_pretendents.append(path)
-                    return
+                    for j in range(0, len(connections)):
+                        conn1 = False#conn1 and conn2 are just stupid variable names, the variables themselves 
+                        conn2 = False#are used to check if connections contain (current and finish) pair
+                        if connections[j][0].x == current.x and connections[j][0].y == current.y:
+                            if connections[j][1].x == finish.x and connections[j][1].y == finish.y:
+                                conn1 = True
+                        if connections[j][0].x == finish.x and connections[j][0].y == finish.y:
+                            if connections[j][1].x == current.x and connections[j][1].y == current.y:
+                                conn2 = True
+
+                    if conn1 == False and conn2 == False:
+                        connections_pretendents.append(path)
+                        return
                     
 
                 if matrix[neighbours[i].x][neighbours[i].y] == False:
                     matrix[neighbours[i].x][neighbours[i].y] = True
+                    connections.append([current, neighbours[i]])
                     new_path = path
                     new_path.append(neighbours[i])
                     keinenamenahnungen(new_path)
@@ -708,7 +721,7 @@ players[0].show_area()
 players[1].show_area()
 #players[0].get_area()
 #players[1].put_dot()
-#time.sleep(5)
+#time.sleep(3)
 is_procrastinating_with_homework = False
 while is_procrastinating_with_homework == False:
     for i in range(0, len(players)):
