@@ -156,7 +156,12 @@ class Dot:
             neighbours = current.get_accessible_neighbours()
 
             for i in range(0, len(neighbours)):
+                if neighbours[i].check_for_connection_with(current) == True:
+                    connections.append([current, neighbours[i]])
                 if neighbours[i].x == self.x and neighbours[i].y == self.y:
+
+
+
                     #print(look_for_element(connections, [current, self]) == False)
                     #print(look_for_element(connections, [self, current]) == False)
                     
@@ -519,7 +524,9 @@ class Player:
 
             neighbours = current.get_accessible_neighbours()
             for i in range(0, len(neighbours)):
-                 
+                if neighbours[i].check_for_connection_with(current) == True:
+                    connections.append([current, neighbours[i]])
+
                 if neighbours[i].x == finish.x and neighbours[i].y == finish.y:
                     for j in range(0, len(connections)):
                         conn1 = False#conn1 and conn2 are just stupid variable names, the variables themselves 
@@ -657,7 +664,10 @@ class Player:
         board[x][y].update()
         self.are_connections_possible(board[x][y])
         time_spent = time.time() - time_spent
+        global process_time
         print('time spent: %s' % time_spent)
+        
+        process_time += time_spent
         return 'ja ja arbeit arbeit'
 
 
@@ -673,6 +683,7 @@ global board
 board = []
 global process_time
 process_time = 0
+operations = 0
 
 for i in range(0, size_of_board):
     row = []
@@ -725,7 +736,9 @@ players[1].show_area()
 is_procrastinating_with_homework = False
 while is_procrastinating_with_homework == False:
     for i in range(0, len(players)):
+        operations += 1
         if players[i].put_dot() == 'schmetterling':
             is_procrastinating_with_homework = True
             break
-#print('Overall processor time: %s' % process_time)
+print('Overall processor time: %s' % process_time)
+print('Average processor time per an operation: %s' % str(process_time/operations))
