@@ -3,7 +3,9 @@ tk = Tk()
 canvas = Canvas(tk, width=500, height=500)
 canvas.pack()
 
+import os
 import time
+#os.system('cls')
 
 
 class Dot:
@@ -14,10 +16,10 @@ class Dot:
         self.dots_connected = dots_connected
 
     def printme(self):
-        print("coordinates: ")
-        print(str(self.x) + ' ' + str(self.y))
-        print("team: ")
-        print(self.team.colour)
+        #print("coordinates: ")
+        print('x:' + str(self.x) + ' ' + 'y:' + str(self.y))
+        #print("team: ")
+        #print(self.team.colour)
         #print("connections: ")
         #print(self.dots_connected)
         print("")
@@ -135,6 +137,13 @@ class Dot:
                                                   #
         return neighbours
 
+
+    def ist_an_der_grenze(self):
+        if self.x == 0 or self.x == size_of_board - 1 or self.y == 0 or self.y == size_of_board - 1:
+            return True
+        return False
+
+
     def connection_possibility(self):
         matrix = []
         for i in range(0, size_of_board):
@@ -153,18 +162,17 @@ class Dot:
               #  connections[i][0].printme()
                # connections[i][1].printme()
             
+
             neighbours = current.get_accessible_neighbours()
+            besonderer_fall = current.ist_an_der_grenze() and self.ist_an_der_grenze() and not(current.x == self.x) and not(current.y == self.y)
+
 
             for i in range(0, len(neighbours)):
                 if neighbours[i].check_for_connection_with(current) == True:
                     connections.append([current, neighbours[i]])
-                if neighbours[i].x == self.x and neighbours[i].y == self.y:
 
-
-
-                    #print(look_for_element(connections, [current, self]) == False)
-                    #print(look_for_element(connections, [self, current]) == False)
-                    
+                
+                if (neighbours[i].x == self.x and neighbours[i].y == self.y) or besonderer_fall:
                     conn1 = False
                     conn2 = False
                     for j in range(0, len(connections)):
@@ -179,7 +187,14 @@ class Dot:
                     #print(conn2)
                     if conn1 == False and conn2 == False:
                         connections.append([self, current])
-                        self.team.find_connections(self, current)
+                        if besonderer_fall:
+                            self.printme()
+                            current.printme()
+                            self.team.find_connections(self, current)
+                            print('hat an der grenze gefunden')
+                        else:
+                            self.team.find_connections(self, current)
+                            print('found')
                 
                 if matrix[neighbours[i].x][neighbours[i].y] == False:
                     matrix[neighbours[i].x][neighbours[i].y] = True
@@ -493,83 +508,146 @@ class Player:
 
 
     def find_connections(self, start, finish):
-        #depth first search
-        #iterate through all possiple paths
-        #choose one that goes from start to finish and is the longest
+        #work on either case, that is, if the ends are on the border or not
                                                                                                                                                                         #at this point i doubt that my code is the most efficient or readable
-                                                                                                                                                                        #but i don't care
-        #print('start and finish')
-        #start.printme()
-        #finish.printme()
-        #print('connections pretendents')
+                                                                                                                                                                        #but my apologies, i tried my best
+        if start.ist_an_der_grenze() and finish.ist_an_der_grenze():
+            conn_pretendents = []#for connection cases when borders are involved
+            #start.printme()
+            #finish.printme()
+            matrix = []
+            for i in range(0, size_of_board):
+                row = []
+                for j in range(0, size_of_board):
+                    row.append(False)
+                matrix.append(row)
+            matrix[start.x][start.y] = True
+            #matrix[finish.x][finish.y] = True
+
+            wird_enden = False
+            while wird_enden == False:
+                path = [start]
+                
+                while True:
+                    current = path[len(path) - 1]
+
+                    to_fineesh_da_luup_up = False
+
+                    neighbours = current.get_accessible_neighbours()
+                    i = 0
+                    while len(neighbours) > i:
+
+                        if neighbours[i].x == finish.x and neighbours[i].y == finish.y:
+                            conn_pretendents.append(path)
+                            to_fineesh_da_luup_up = True
+                            break
+
+                        if matrix[neighbours[i].x][neighbours[i].y] == False:
+                            matrix[neighbours[i].x][neighbours[i].y] = True
+                            path.append(neighbours[i])
+                            break
+                        i += 1
+                    if i == len(neighbours) or to_fineesh_da_luup_up:
+                        #wird_enden = True
+                        break
+                print('new path')
+                for i in range(0, len(path)):
+                    path[i].printme()
+                
+                if path == [start]:
+                    wird_enden = True
+            
+            maxlen = 0
+            maxindex = -1
+            for i in range(0, len(conn_pretendents)):
+                if len(conn_pretendents[i]) > maxlen:
+                    maxindex = i
+                    maxlen = len(conn_pretendents[i])
+        
+            self.make_connections(conn_pretendents[maxindex])
+
+
+                            
+
+
+
+        else:
+            #depth first search
+            #iterate through all possiple paths
+            #choose one that goes from start to finish and is the longest
+
+
+            #print('start and finish')
+            #start.printme()
+            #finish.printme()
+            #print('connections pretendents')
         
         
         
-        connections_pretendents = []
+            connections_pretendents = []
         
        
-        matrix = []
-        for i in range(0, size_of_board):
-            row = []
-            for j in range(0, size_of_board):
-                row.append(False)
-            matrix.append(row)
-        matrix[start.x][start.y] = True
-        matrix[finish.x][finish.y] = True
+            matrix = []
+            for i in range(0, size_of_board):
+                row = []
+                for j in range(0, size_of_board):
+                    row.append(False)
+                matrix.append(row)
+            matrix[start.x][start.y] = True
+            matrix[finish.x][finish.y] = True
 
-        connections = []
+            connections = []
 
-        def keinenamenahnungen(path):
-            current = path[len(path) - 1]
+            def keinenamenahnungen(path):
+                current = path[len(path) - 1]
 
-            neighbours = current.get_accessible_neighbours()
-            for i in range(0, len(neighbours)):
-                if neighbours[i].check_for_connection_with(current) == True:
-                    connections.append([current, neighbours[i]])
+                neighbours = current.get_accessible_neighbours()
+                for i in range(0, len(neighbours)):
+                    if neighbours[i].check_for_connection_with(current) == True:
+                        connections.append([current, neighbours[i]])
 
-                if neighbours[i].x == finish.x and neighbours[i].y == finish.y:
-                    for j in range(0, len(connections)):
-                        conn1 = False#conn1 and conn2 are just stupid variable names, the variables themselves 
-                        conn2 = False#are used to check if connections contain (current and finish) pair
-                        if connections[j][0].x == current.x and connections[j][0].y == current.y:
-                            if connections[j][1].x == finish.x and connections[j][1].y == finish.y:
-                                conn1 = True
-                        if connections[j][0].x == finish.x and connections[j][0].y == finish.y:
-                            if connections[j][1].x == current.x and connections[j][1].y == current.y:
-                                conn2 = True
+                    if neighbours[i].x == finish.x and neighbours[i].y == finish.y:
+                        for j in range(0, len(connections)):
+                            conn1 = False#conn1 and conn2 are just stupid variable names, the variables themselves 
+                            conn2 = False#are used to check if connections contain (current and finish) pair
+                            if connections[j][0].x == current.x and connections[j][0].y == current.y:
+                                if connections[j][1].x == finish.x and connections[j][1].y == finish.y:
+                                    conn1 = True
+                            if connections[j][0].x == finish.x and connections[j][0].y == finish.y:
+                                if connections[j][1].x == current.x and connections[j][1].y == current.y:
+                                    conn2 = True
 
-                    if conn1 == False and conn2 == False:
-                        connections_pretendents.append(path)
-                        return
+                        if conn1 == False and conn2 == False:
+                            connections_pretendents.append(path)
+                            return
                     
 
-                if matrix[neighbours[i].x][neighbours[i].y] == False:
-                    matrix[neighbours[i].x][neighbours[i].y] = True
-                    connections.append([current, neighbours[i]])
-                    new_path = path
-                    new_path.append(neighbours[i])
-                    keinenamenahnungen(new_path)
+                    if matrix[neighbours[i].x][neighbours[i].y] == False:
+                        matrix[neighbours[i].x][neighbours[i].y] = True
+                        connections.append([current, neighbours[i]])
+                        new_path = path
+                        new_path.append(neighbours[i])
+                        keinenamenahnungen(new_path)
                     
         
-        keinenamenahnungen([start])
+            keinenamenahnungen([start])
         
-        for i in range(0, len(connections_pretendents)):
-            
-            connections_pretendents[i].append(finish)
+            for i in range(0, len(connections_pretendents)):
+                connections_pretendents[i].append(finish)
             
 
-        maxlen = 0
-        maxindex = -1
-        for i in range(0, len(connections_pretendents)):
-            #print('new connection')
-            #for j in range(0, len(connections_pretendents[i])):
-             #   connections_pretendents[i][j].printme()
+            maxlen = 0
+            maxindex = -1
+            for i in range(0, len(connections_pretendents)):
+                #print('new connection')
+                #for j in range(0, len(connections_pretendents[i])):
+                 #   connections_pretendents[i][j].printme()
 
-            if len(connections_pretendents[i]) > maxlen:
-                maxindex = i
-                maxlen = len(connections_pretendents[i])
+                if len(connections_pretendents[i]) > maxlen:
+                    maxindex = i
+                    maxlen = len(connections_pretendents[i])
         
-        self.make_connections(connections_pretendents[maxindex])
+            self.make_connections(connections_pretendents[maxindex])
 
 
        
@@ -725,14 +803,20 @@ for i in range(0, size_of_board):
     for j in range(0, size_of_board):    
         board[i][j].update()
 
-#players[0].are_connections_possible(board[0][0])
+#players[0].are_connections_possible(board[2][0])
 #print('so long')
+
+#print(board[0][0].ist_an_der_grenze())
+#print(board[0][6].ist_an_der_grenze())
+#print(board[9][19].ist_an_der_grenze())
+#print(board[7][6].ist_an_der_grenze())
 
 players[0].show_area()
 players[1].show_area()
 #players[0].get_area()
 #players[1].put_dot()
 #time.sleep(3)
+
 is_procrastinating_with_homework = False
 while is_procrastinating_with_homework == False:
     for i in range(0, len(players)):
@@ -740,5 +824,10 @@ while is_procrastinating_with_homework == False:
         if players[i].put_dot() == 'schmetterling':
             is_procrastinating_with_homework = True
             break
+        #else:
+            #os.system('cls')
 print('Overall processor time: %s' % process_time)
 print('Average processor time per an operation: %s' % str(process_time/operations))
+
+if process_time/operations < 1:
+    print('well done programmer, well done computer')
