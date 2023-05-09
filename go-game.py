@@ -5,7 +5,7 @@ canvas.pack()
 
 import os
 import time
-#os.system('cls')
+os.system('cls')
 
 
 class Dot:
@@ -154,6 +154,7 @@ class Dot:
         matrix[self.x][self.y] = True
 
         connections = []
+        #self.printme()
 
         def suchen(current):
             #print('new check')
@@ -164,13 +165,19 @@ class Dot:
             
 
             neighbours = current.get_accessible_neighbours()
-            besonderer_fall = current.ist_an_der_grenze() and self.ist_an_der_grenze() and not(current.x == self.x) and not(current.y == self.y)
-
+            
 
             for i in range(0, len(neighbours)):
                 if neighbours[i].check_for_connection_with(current) == True:
                     connections.append([current, neighbours[i]])
 
+                
+                besonderer_fall = False
+                if neighbours[i].ist_an_der_grenze():
+                    if self.ist_an_der_grenze():
+                        if not(neighbours[i].x == self.x and neighbours[i].y == self.y):    
+                            besonderer_fall = True
+                
                 
                 if (neighbours[i].x == self.x and neighbours[i].y == self.y) or besonderer_fall:
                     conn1 = False
@@ -187,15 +194,20 @@ class Dot:
                     #print(conn2)
                     if conn1 == False and conn2 == False:
                         connections.append([self, current])
+                        
+                        
                         if besonderer_fall:
-                            self.printme()
-                            current.printme()
-                            self.team.find_connections(self, current)
+                            #self.printme()
+                            #neighbours[i].printme()
+                            self.team.find_connections(self, neighbours[i])
                             print('hat an der grenze gefunden')
                         else:
                             self.team.find_connections(self, current)
                             print('found')
                 
+                #neighbours[i].printme()
+                #print(besonderer_fall)
+
                 if matrix[neighbours[i].x][neighbours[i].y] == False:
                     matrix[neighbours[i].x][neighbours[i].y] = True
                     connections.append([current, neighbours[i]])
@@ -550,9 +562,9 @@ class Player:
                     if i == len(neighbours) or to_fineesh_da_luup_up:
                         #wird_enden = True
                         break
-                print('new path')
-                for i in range(0, len(path)):
-                    path[i].printme()
+                #print('new path')
+                #for i in range(0, len(path)):
+                 #   path[i].printme()
                 
                 if path == [start]:
                     wird_enden = True
@@ -600,16 +612,22 @@ class Player:
 
             def keinenamenahnungen(path):
                 current = path[len(path) - 1]
-
+                #print('path')
+                #for i in range(0, len(path)):
+                 #   path[i].printme()
+                
                 neighbours = current.get_accessible_neighbours()
+
                 for i in range(0, len(neighbours)):
                     if neighbours[i].check_for_connection_with(current) == True:
                         connections.append([current, neighbours[i]])
 
                     if neighbours[i].x == finish.x and neighbours[i].y == finish.y:
+
                         for j in range(0, len(connections)):
                             conn1 = False#conn1 and conn2 are just stupid variable names, the variables themselves 
                             conn2 = False#are used to check if connections contain (current and finish) pair
+
                             if connections[j][0].x == current.x and connections[j][0].y == current.y:
                                 if connections[j][1].x == finish.x and connections[j][1].y == finish.y:
                                     conn1 = True
@@ -621,12 +639,21 @@ class Player:
                             connections_pretendents.append(path)
                             return
                     
-
+                    #print('processing')
+                    #neighbours[i].printme()
+                    #print(matrix[neighbours[i].x][neighbours[i].y])
                     if matrix[neighbours[i].x][neighbours[i].y] == False:
                         matrix[neighbours[i].x][neighbours[i].y] = True
+                        
                         connections.append([current, neighbours[i]])
-                        new_path = path
+
+                        #here we cannot use the = operator, because it assigns arrays by reference
+                        #but we need path to be isolated from new_path
+                        new_path = []
+                        for j in range(0, len(path)):
+                            new_path.append(path[j])
                         new_path.append(neighbours[i])
+
                         keinenamenahnungen(new_path)
                     
         
@@ -635,6 +662,10 @@ class Player:
             for i in range(0, len(connections_pretendents)):
                 connections_pretendents[i].append(finish)
             
+            #for i in range(0, len(connections)):
+                #print('new')
+                #connections[i][0].printme()
+                #connections[i][1].printme()
 
             maxlen = 0
             maxindex = -1
@@ -752,7 +783,7 @@ class Player:
 
 
 
-number_of_players = 2#int(input("number of players: "))
+number_of_players = 2
 
 #create two-dimmensional array of objects that represent dots
 global size_of_board
@@ -796,6 +827,10 @@ players = n_players
 #board[0][1].team = players[0]
 #board[1][2].team = players[0]
 #board[1][1].team = players[0]
+#board[3][3].team = players[0]
+#board[3][2].team = players[0]
+#board[2][3].team = players[0]
+#board[3][0].team = players[0]
 
 #players[0].make_connections([board[2][2], board[1][1], board[0][2], board[1][3]])
 
@@ -803,13 +838,11 @@ for i in range(0, size_of_board):
     for j in range(0, size_of_board):    
         board[i][j].update()
 
-#players[0].are_connections_possible(board[2][0])
+#print(board[0][0].ist_an_der_grenze())
+#players[0].are_connections_possible(board[3][0])
 #print('so long')
 
-#print(board[0][0].ist_an_der_grenze())
-#print(board[0][6].ist_an_der_grenze())
-#print(board[9][19].ist_an_der_grenze())
-#print(board[7][6].ist_an_der_grenze())
+
 
 players[0].show_area()
 players[1].show_area()
@@ -824,10 +857,10 @@ while is_procrastinating_with_homework == False:
         if players[i].put_dot() == 'schmetterling':
             is_procrastinating_with_homework = True
             break
-        #else:
-            #os.system('cls')
+        else:
+            os.system('cls')
 print('Overall processor time: %s' % process_time)
 print('Average processor time per an operation: %s' % str(process_time/operations))
 
-if process_time/operations < 1:
+if process_time/operations < 0.1:
     print('well done programmer, well done computer')
