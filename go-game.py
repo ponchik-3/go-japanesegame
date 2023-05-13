@@ -4,7 +4,7 @@ import time
 import random
 os.system('cls')
 
-def fffff():
+'''def fffff():
     print('bbb   rrrr     a      i    n   n  fffff  u   u   cccc  k   k')
     print('b  b  r   r   a a     i    nn  n  f      u   u  c      k kk ')
     print('bbb   rrrr   a   a    i    n n n  ffff   u   u  c      kk')
@@ -16,7 +16,7 @@ if random_number == 0:
     fffff()
     time.sleep(1)
     os.system('cls')
-
+'''
 
 class Dot:
     def __init__(self, xcoordinate, ycoordinate, team, dots_connected):
@@ -601,18 +601,19 @@ class Player:
         path[len(path) - 1].dots_connected.append(path[0])
         path[0].dots_connected.append(path[len(path) - 1])
         
+        self.area = self.get_area(localboard)
+
         if is_for_real == 'real bro':
             for i in range(0, len(path)):
                 path[i].update()
-        
-        self.area = self.get_area(localboard)
-        
-
-        
+            self.show_area()
         
 
+        
+        
 
-    def find_connections(self, start, finish, localboard, is_for_real):    
+
+    def find_connections(self, start, finish, localboard, is_for_real):
         #depth first search
         #iterate through all possiple paths
         #choose one that goes from start to finish and is the longest
@@ -965,7 +966,7 @@ class Player:
                             for j in range(0, size_of_board):
                                 k = 0
                                 while k < len(localboard[i][j].dots_connected):
-                                    
+                                    #print('IUo& Tu BcpaBcR' + str(random.randint(0, 1)))
                                     if localboard[i][j].dots_connected[k].x == x and localboard[i][j].dots_connected[k].y == y:
                                         del localboard[i][j].dots_connected[k]
                                     else:
@@ -996,6 +997,9 @@ else:
     game_mode = 'bot'
     
 tk = Tk()
+tk.title('Game board')
+tk.resizable(0, 0)
+tk.wm_attributes('-topmost', 1)
 canvas = Canvas(tk, width=500, height=500)
 canvas.pack()
 os.system('cls')
@@ -1026,7 +1030,21 @@ players = [Player('#ff0000', 0, 'red', 0), Player('#00ff00', 0, 'green', 20), Pl
                Player('#bbbb00', 0, 'golden', 50),
                Player('#117733', 0, 'nocolouridea', 60), Player('#999999', 0, 'silver', 70)]
 
-game_mode = 'bot'
+#game_mode = 'bot'
+
+
+def get_winner(one, two):
+    print('Area circled by player ' + one.interface_colour + ': ' + str(one.area))
+    print('Area circled by player ' + two.interface_colour + ': ' + str(two.area))
+    if one.area > two.area:
+        print('Player ' + one.interface_colour + ' won!')
+    elif two.area > one.area:
+        print('Player ' + two.interface_colour + ' won!')
+    else:
+        print('I Ko3A cuTA, I KAnycTA U,I^A')
+
+    
+
 
 if game_mode == 'twoplayer':
     number_of_players = 2
@@ -1062,6 +1080,8 @@ if game_mode == 'twoplayer':
 
     if process_time/operations < 0.1:
         print('well done programmer, well done computer')
+    for i in range(0, 5):
+        print('')
 
 
 
@@ -1082,6 +1102,7 @@ else:
     #board[0][1].team = bot
     #board[0][3].team = bot
     #board[0][4].team = bot
+    #board[0][5].team = bot
 
 
     #for i in range(0, size_of_board):
@@ -1095,9 +1116,16 @@ else:
         if human.put_dot() == 'schmetterling':
             NV_is_waiting = True
             break
-        bot.choose_dot()
-        operations += 2
-    bot.choose_dot()
+        else:
+            os.system('cls')
+            print('warten sie bitte, maschine denkt')
+            bot.choose_dot()
+            operations += 2
+            os.system('cls')
+    #bot.choose_dot()
+    get_winner(human, bot)
     print('Average processor time per one operation: %s' % str(process_time/operations))
     if process_time/operations < 2:
         print('well done coder, well done a clew of transistors')
+    for i in range(0, 5):
+        print('')
