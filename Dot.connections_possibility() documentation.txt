@@ -1,1 +1,4 @@
+the method is used to check from a given dot perspective if there can be made some connections
+It uses depth first search to iterate through all possible potential connections and choose one that matches
+the rules of the game, i.e. surrounds some geometrical area
 
