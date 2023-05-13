@@ -6,3 +6,7 @@ by accessible I mean that they are or can possibly be connected
 then it stores all this construction in one array(wave)
 and calls Dot.connections_possibility method
 which does all the job
+
+when the player is a bot, the function is called from .get_the_best_place() method 
+and works with imaginary array of dots
+by imaginary I mean that it won't be displayed for user
