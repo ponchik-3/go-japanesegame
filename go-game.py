@@ -1041,20 +1041,74 @@ def get_winner(one, two):
     elif two.area > one.area:
         print('Player ' + two.interface_colour + ' won!')
     else:
-        print('I Ko3A cuTA, I KAnycTA U,I^A')
+        print('i Ko3A cuTA, i KAnycTA U,i/\A')
 
     
 
 
 if game_mode == 'twoplayer':
-    number_of_players = 2
-
+    
     n_players = []
-    for i in range(0, number_of_players):
-        n_players.append(players[i])
+    
+
+    print('Choose your colours')
+    print('')
+    
+    print('Player one, choose your colour')
+    print('Available options: ')
+    for i in range(0, len(players)):
+        print(players[i].interface_colour)
+    
+
+    def process_response(response):
+        for i in range(0, len(players)):
+            if response == players[i].interface_colour:
+                return i
+        return -1
+    response = process_response(input('Type the colour: '))
+    print('')
+    
+    while response == -1:
+        print('seriously? do something smarter than trying to break input system')
+        print('Player one, choose your colour')
+        response = process_response(input('Type the colour: '))
+    n_players.append(players[response])
+    print('')
+    del players[response]
+
+
+
+    print('Player two, choose your colour')
+    print('Available options: ')
+    for i in range(0, len(players)):
+        print(players[i].interface_colour)
+    
+
+    def process_response(response):
+        for i in range(0, len(players)):
+            if response == players[i].interface_colour:
+                return i
+        return -1
+    
+    response = process_response(input('Type the colour: '))
+    print('')
+
+    while response == -1:
+        print('seriously? do something smarter than trying to break input system')
+        print('Player two, choose your colour')
+        response = process_response(input('Type the colour: '))
+    n_players.append(players[response])
+    print('')
+
     players = n_players
+    os.system('cls')
 
 
+    
+    
+
+    for i in range(0, len(players)):
+        players[i].interface_height = i*20
 
     players[0].show_area()
     players[1].show_area()
@@ -1075,6 +1129,10 @@ if game_mode == 'twoplayer':
             else:
                 players[i].show_area()
                 os.system('cls')
+    
+    get_winner(players[0], players[1])
+    print('')
+    
     print('Overall processor time: %s' % process_time)
     print('Average processor time per an operation: %s' % str(process_time/operations))
 
@@ -1086,8 +1144,56 @@ if game_mode == 'twoplayer':
 
 
 else:
-    human = players[0]
-    bot = players[1]
+    
+    print('Choose your colours')
+    print('')
+    
+    print('Human, choose your colour')
+    print('Available options: ')
+    for i in range(0, len(players)):
+        print(players[i].interface_colour)
+    
+
+    def process_response(response):
+        for i in range(0, len(players)):
+            if response == players[i].interface_colour:
+                return i
+        return -1
+    response = process_response(input('Type the colour: '))
+    print('')
+    
+    while response == -1:
+        print('seriously? do something smarter than trying to break input system')
+        print('Human, choose your colour')
+        response = process_response(input('Type the colour: '))
+    human = players[response]
+    print('')
+    del players[response]
+
+
+    
+    print('Choose a colour for computer')
+    print('Available options: ')
+    for i in range(0, len(players)):
+        print(players[i].interface_colour)
+    
+
+    def process_response(response):
+        for i in range(0, len(players)):
+            if response == players[i].interface_colour:
+                return i
+        return -1
+    response = process_response(input('Type the colour: '))
+    print('')
+    
+    while response == -1:
+        print('seriously? do something smarter than trying to break input system')
+        print('Choose a colour for computer')
+        response = process_response(input('Type the colour: '))
+    bot = players[response]
+    print('')
+    del players[response]
+
 
     human.show_area()
     bot.show_area()
