@@ -450,9 +450,9 @@ def look_for_element(array, element):
 
 
 class Player:
-    def __init__(self, colour, area_chart, interface_colour, interface_height):
+    def __init__(self, colour, area, interface_colour, interface_height):
         self.colour = colour
-        self.area = area_chart
+        self.area = area
         self.interface_colour = interface_colour
         self.interface_height = interface_height
 
@@ -891,12 +891,11 @@ class Player:
 
 
 
-    def choose_dot(self):
+    def choose_dot(self, preferred_one):
         start = time.time()
 
-        preferred_one = self.get_the_best_place(board, 1, 1)
-        preferredx = preferred_one[0]
-        preferredy = preferred_one[1]
+        preferredx = preferred_one.x
+        preferredy = preferred_one.y
         print(str(preferredx) + ' ' + str(preferredy))
         board[preferredx][preferredy] = Dot(preferredx, preferredy, self, [])
         self.are_connections_possible(board[preferredx][preferredy], board, 'real bro')
@@ -911,72 +910,145 @@ class Player:
 
 
 
-    def get_the_best_place(self, board_to_work_with, max_iteration, current_iteration):
-        #if current_iteration < max_iteration:
+    def get_the_best_place(self, opponent, depth):
+
+        #consider not only bot.area but also opponent.area
+        class Utility_of_the_dot:
+            def __init__(self, dot, utility):
+                self.dot = dot
+                self.utility = utility
         
-            maxneubereich = 0
-            maxx = 0
-            maxy = 0
-            while check_for_position_acceptance(maxx, maxy, board_to_work_with) == False:
-                if maxy < size_of_board - 1:
-                    maxy += 1
-                else:
-                    maxy = 0
-                    maxx += 1
+        utilities = []
+
+        def iterations(board_to_work_with, opponent, max_iteration, current_iteration):
+            if current_iteration < max_iteration:
             
-            #check every possible iteration of given depth
-            for x in range(0, size_of_board):
-                for y in range(0, size_of_board):
+                #imitate moves of both bot and imaginary opponent
+                #until the max_iteration reaches its ceil
+
+            
+
+
+                for x in range(0, size_of_board):
+                    for y in range(0, size_of_board):
                 
-                    localboard = []
-                    for i in range(0, size_of_board):
-                        row = []
-                        for j in range(0, size_of_board):
-                            dot_vorbereitung = Dot(0, 0, None, [])
-                            dot_vorbereitung.x = board_to_work_with[i][j].x
-                            dot_vorbereitung.y = board_to_work_with[i][j].y
-                            dot_vorbereitung.team = board_to_work_with[i][j].team
-                            for k in range(0, len(board_to_work_with[i][j].dots_connected)):
-                                dot_vorbereitung.dots_connected.append(board_to_work_with[i][j].dots_connected[k])
-
-                            row.append(dot_vorbereitung)
-                        localboard.append(row)
-                    
-
-                    
-                    
-                    if check_for_position_acceptance(x, y, localboard) == True:
-                        localboard[x][y].team = self
-                        self.are_connections_possible(localboard[x][y], localboard, 'imaginary abstraction')
-                        area = self.get_area(localboard)
-
-                        if area > maxneubereich:
-                            maxneubereich = area
-                            maxx = x
-                            maxy = y
-                        
-                        #me try make simple readable code
-                        #me can not
-                        #me write stupid code chunk
-                        #my code be messy but worky
-                        localboard[x][y].team = None
-                        localboard[x][y].dots_connected = []
-
+                        localboard = []
                         for i in range(0, size_of_board):
+                            row = []
                             for j in range(0, size_of_board):
-                                k = 0
-                                while k < len(localboard[i][j].dots_connected):
-                                    #print('IUo& Tu BcpaBcR' + str(random.randint(0, 1)))
-                                    if localboard[i][j].dots_connected[k].x == x and localboard[i][j].dots_connected[k].y == y:
-                                        del localboard[i][j].dots_connected[k]
-                                    else:
-                                        k += 1
+                                dot_vorbereitung = Dot(0, 0, None, [])
+                                dot_vorbereitung.x = board_to_work_with[i][j].x
+                                dot_vorbereitung.y = board_to_work_with[i][j].y
+                                dot_vorbereitung.team = board_to_work_with[i][j].team
+                                for k in range(0, len(board_to_work_with[i][j].dots_connected)):
+                                    dot_vorbereitung.dots_connected.append(board_to_work_with[i][j].dots_connected[k])
+
+                                row.append(dot_vorbereitung)
+                            localboard.append(row)
+                    
+
+                    
+                    
+                        if check_for_position_acceptance(x, y, localboard) == True:
+                            localboard[x][y].team = self
+                            self.are_connections_possible(localboard[x][y], localboard, 'imaginary abstraction')
+
+                            for xx in range(0, size_of_board):
+                                for yy in range(0, size_of_board):
+                                    if check_for_position_acceptance(xx, yy, localboard):
+                                        localboard[xx][yy].team = opponent
+                                        opponent.are_connections_possible(localboard[xx][yy], localboard, 'imaginary abstraction')
+                                    
+                                        iterations(localboard, opponent, max_iteration, current_iteration + 1)
+
+
+
+
+
+
+
+            elif current_iteration == max_iteration:
+        
+                maxneubereich = 0
+                maxx = 0
+                maxy = 0
+                while check_for_position_acceptance(maxx, maxy, board_to_work_with) == False:
+                    if maxy < size_of_board - 1:
+                        maxy += 1
+                    else:
+                        maxy = 0
+                        maxx += 1
+            
+                #check every possible iteration of given depth
+                for x in range(0, size_of_board):
+                    for y in range(0, size_of_board):
+
+                        localboard = []
+                        for i in range(0, size_of_board):
+                            row = []
+                            for j in range(0, size_of_board):
+                                dot_vorbereitung = Dot(0, 0, None, [])
+                                dot_vorbereitung.x = board_to_work_with[i][j].x
+                                dot_vorbereitung.y = board_to_work_with[i][j].y
+                                dot_vorbereitung.team = board_to_work_with[i][j].team
+                                for k in range(0, len(board_to_work_with[i][j].dots_connected)):
+                                    dot_vorbereitung.dots_connected.append(board_to_work_with[i][j].dots_connected[k])
+
+                                row.append(dot_vorbereitung)
+                            localboard.append(row)
+                    
+
+                    
+                    
+                        if check_for_position_acceptance(x, y, localboard) == True:
+                            localboard[x][y].team = self
+                            self.are_connections_possible(localboard[x][y], localboard, 'imaginary abstraction')
+                            area = self.get_area(localboard)
+
+                            if area > maxneubereich:
+                                maxneubereich = area
+                                maxx = x
+                                maxy = y
+                        
+                            #me try make simple readable code
+                            #me can not
+                            #me write stupid code chunk
+                            #my code be messy but worky
+                            localboard[x][y].team = None
+                            localboard[x][y].dots_connected = []
+
+                            for i in range(0, size_of_board):
+                                for j in range(0, size_of_board):
+                                    k = 0
+                                    while k < len(localboard[i][j].dots_connected):
+                                        #print('IUo& Tu ciB Ta BcpaBcR' + str(random.randint(0, 1)))
+                                        if localboard[i][j].dots_connected[k].x == x and localboard[i][j].dots_connected[k].y == y:
+                                            del localboard[i][j].dots_connected[k]
+                                        else:
+                                            k += 1
                                     
                                     
 
                 
                 
-            return [maxx, maxy]
+                utilities.append(Utility_of_the_dot(board[maxx][maxy], area))
+
+
+        
+        iterations(board, opponent, depth, 1)
+
+        
+        maxutility = utilities[0]
+        maxutilityindex = 0
+        for i in range(1, len(utilities)):
+            if maxutility < utilities[i]:
+                maxutility = utilities[i]
+                maxutilityindex = i
+        
+        self.choose_dot(utilities[maxutilityindex].dot)
+        
+
+
     
 
 
@@ -1216,6 +1288,9 @@ else:
       #      board[i][j].update()
 
     #time.sleep(6)
+    
+    
+    #bot.get_the_best_place(human, 1)
 
     NV_is_waiting = False
     while NV_is_waiting == False:
@@ -1224,11 +1299,13 @@ else:
             break
         else:
             os.system('cls')
-            print('warten sie bitte, maschine denkt')
-            bot.choose_dot()
+            print('warten sie bitte, die maschine denkt')
+            #print('Ti/|bKu c/|a&aKu nocTiuHo onTuMi3yI-OTb, cu/|a4i KynyI-OTb KpaIU,i MaIUuHu')
+
+            bot.get_the_best_place(human, 1)
             operations += 2
             os.system('cls')
-    #bot.choose_dot()
+
     get_winner(human, bot)
     print('Average processor time per one operation: %s' % str(process_time/operations))
     if process_time/operations < 2:
