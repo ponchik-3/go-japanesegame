@@ -35,9 +35,20 @@ std::ostream& operator <<(std::ostream & out, vector<Dot> vect)
 std::ostream& operator <<(std::ostream & out, vector<vector<Dot>> vect)
 {
     for (int i = 0; i < vect.size(); i++)
-    {
-        out << i << "\n" << vect[i] << endl;
-    }
+	{
+		for (int j = 0; j < vect.size(); j++)
+		{
+			if (vect[j][i].team.colour == "")
+			{
+				out << "' ";
+			}
+			else
+			{
+				out << vect[j][i].team.colour << " ";
+			}
+		}
+		out << std::endl;
+	}
     return out;
 }
 

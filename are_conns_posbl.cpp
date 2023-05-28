@@ -6,6 +6,11 @@ typedef std::vector<std::vector<bool>> matr;
 
 void Player::are_connections_possible(Dot start, gboard & localboard)
 {
+    if (start.team.colour == "")
+    {
+        std::cout << "B3RB HoFu B pyKu i nIIIoB BunpaB/|RTu cBoi noMu/|Ku,\nRK no TBoEMy Tpe&a cno/|y4aTu nycTi To4Ku?\nerror calling Player::are_connections_possible\n";
+        throw "d";
+    }
     matr matrix;
     gboard wave;
     int size = localboard.size();

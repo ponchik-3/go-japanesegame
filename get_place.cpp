@@ -2,6 +2,7 @@
 #include <vector>
 #include <chrono>
 #include "classes.h"
+#include "io_operators.h"
 
 typedef std::vector<std::vector<Dot>> gboard;
 typedef std::vector<std::vector<bool>> matr;
@@ -102,37 +103,56 @@ int iterations(gboard board_to_work_with, Player & opponent, int max_iteration,
 
     if (current_iteration < max_iteration)
     {
-        for (int x = 0; x < size; x++)
+        int x = 0;
+        int y = 0;
+        while (x < size && y < size)
         {
-            for (int y = 0; y < size; y++)
+            localboard = board_to_work_with;
+
+            if (check_for_position_acceptance(x, y, localboard))
             {
-                localboard = board_to_work_with;
-                if (check_for_position_acceptance(x, y, localboard))
+                localboard[x][y].team.colour = self.colour;
+                self.are_connections_possible(localboard[x][y], localboard);
+                
+                int xx = 0;
+                int yy = 0;
+                while (xx < size && yy < size)
                 {
-                    localboard[x][y].team.colour = self.colour;
-                    self.are_connections_possible(localboard[x][y], localboard);
-
-                    for (int xx = 0; xx < size; xx++)
+                    if (check_for_position_acceptance(xx, yy, localboard))
                     {
-                        for (int yy = 0; yy < size; yy++)
-                        {
-                            if (check_for_position_acceptance(xx, yy, localboard))
-                            {
-                                localboard[xx][yy].team.colour = opponent.colour;
-                                opponent.are_connections_possible(localboard[xx][yy], localboard);
+                        localboard[xx][yy].team.colour = opponent.colour;
+                        opponent.are_connections_possible(localboard[xx][yy], localboard);
 
-                                iterations(localboard, opponent, max_iteration, current_iteration + 1, utilities, self);
-                                clear_dot(xx, yy, localboard);
-                            }
-                        }
+                        iterations(localboard, opponent, max_iteration, current_iteration + 1, utilities, self);
+                        localboard[xx][yy].team.colour = "";
+                        clear_dot(xx, yy, localboard);
                     }
-                    clear_dot(x, y, localboard);
+
+                    if (yy < size - 1)
+                    {
+                        yy++;
+                    }
+                    else
+                    {
+                        yy = 0;
+                        xx++;
+                    }
                 }
+            }
+
+            if (y < size - 1)
+            {
+                y++;
+            }
+            else
+            {
+                y = 0;
+                x++;
             }
         }
     }
-    else 
-    
+
+    else
     {
         if (current_iteration == max_iteration)
         {
@@ -155,30 +175,39 @@ int iterations(gboard board_to_work_with, Player & opponent, int max_iteration,
                     }
                 }
             }
+            std::cout << "maxcoords  " << maxx << " " << maxy << "\n";
 
             //check every possible iteration
-            for (int x = 0; x < size; x++)
+            int x = maxx;
+            int y = maxy;
+            while (x < size && y < size)
             {
-                for (int y = 0; y < size; y++)
+                localboard = board_to_work_with;
+
+                if (check_for_position_acceptance(x, y, localboard))
                 {
-                    localboard = board_to_work_with;
+                    localboard[x][y].team.colour = self.colour;
+                    self.are_connections_possible(localboard[x][y], localboard);
+                    area = self.get_area(localboard) - opponent.get_area(localboard);
 
-                    if (check_for_position_acceptance(x, y, localboard))
+                    if (area > maxneubereich)
                     {
-                        localboard[x][y].team.colour = self.colour;
-                        self.are_connections_possible(localboard[x][y], localboard);
-                        area = self.get_area(localboard) - opponent.get_area(localboard);
-
-                        if (area > maxneubereich)
-                        {
-                            maxneubereich = area;
-                            maxx = x;
-                            maxy = y;
-                        }
-                        clear_dot(x, y, localboard);
+                        maxneubereich = area;
+                        maxx = x;
+                        maxy = y;
                     }
                 }
+                if (y < size - 1)
+                {
+                    y++;
+                }
+                else
+                {
+                    y = 0;
+                    x++;
+                }
             }
+
             Utility_of_dot temp(maxx, maxy, maxneubereich);
             utilities.push_back(temp);
         }
@@ -211,10 +240,14 @@ void Player::get_the_best_place(Player & opponent, int depth, gboard & board)
             maxutilityindex = i;
         }
     }
+    std::cout << "checktest " << maxutility.x << " " << maxutility.y << "\n";
 
     uint64_t finish = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
     std::cout << utilities[maxutilityindex].x << " " << utilities[maxutilityindex].y << std::endl;
+
+    std::cout << "\n\nboard\n" << board;
+
     std::cout << "Time spent: " << (finish - start)/1000.0 << "\n";
-    this->choose_dot(board, board[utilities[maxutilityindex].x][utilities[maxutilityindex].x]);
+    this->choose_dot(board, maxutility.x, maxutility.y);
 }

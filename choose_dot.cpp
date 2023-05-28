@@ -6,15 +6,12 @@
 typedef std::vector<std::vector<Dot>> gboard;
 typedef std::vector<std::vector<bool>> matr;
 
-void Player::choose_dot(gboard & board, Dot preferred_one)
-{
-    int px = preferred_one.x;
-    int py = preferred_one.y;
-    
-    board[py][px].team.colour = this->colour;
-    board[py][px].team.area = this->area;
-    this->are_connections_possible(board[px][py], board);
-	std::cout << "Chosen dot: " << preferred_one << std::endl;
+void Player::choose_dot(gboard & board, int px, int py)
+{   
+    board[px][py].team.colour = this->colour;
+	Player temp(this->area, this->colour);
+    temp.are_connections_possible(board[px][py], board);
+	std::cout << "Chosen dot: " << board[px][py] << std::endl;
 
     for (int i = 0; i < board.size(); i++)
 	{

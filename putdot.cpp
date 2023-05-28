@@ -191,7 +191,7 @@ std::string Player::putdot(gboard & board)
 	uint64_t begin = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 	
 	board[x][y].team.colour = this->colour;
-	board[x][y].team.area = this->area;
+	//board[x][y].team.area = this->area;
 	this->are_connections_possible(board[x][y], board);
 
 	uint64_t end = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();

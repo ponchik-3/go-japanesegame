@@ -36,7 +36,7 @@ class Player
 
         void are_connections_possible(Dot start, gboard & localboard);
 
-        void choose_dot(gboard & board, Dot preferred_one);
+        void choose_dot(gboard & board, int px, int py);
 
         void get_the_best_place(Player & opponent, int depth, gboard & board);
 };

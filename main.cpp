@@ -81,7 +81,7 @@ int main ()
             }
         }
     }
-    /*else
+    else
     {
         Player human(0, "H");
         Player bot(0, "B");
@@ -101,7 +101,7 @@ int main ()
             bot.get_the_best_place(human, 1, board);
             operations++;
         }
-    }*/
+    }
 
     return 0;
 }
