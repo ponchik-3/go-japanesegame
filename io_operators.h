@@ -18,6 +18,8 @@ std::ostream& operator <<(std::ostream & out, vector<Dot> vect);
 
 std::ostream& operator <<(std::ostream & out, vector<vector<Dot>> vect);
 
+std::ostream & operator << (std::ostream & out, vector<vector<int>> vect);
+
 
 
 #endif

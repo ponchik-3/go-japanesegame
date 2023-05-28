@@ -40,3 +40,16 @@ std::ostream& operator <<(std::ostream & out, vector<vector<Dot>> vect)
     }
     return out;
 }
+
+std::ostream & operator << (std::ostream & out, vector<vector<int>> vect)
+{
+    for (int i = 0; i < vect.size(); i++)
+    {
+        for (int j = 0; j < vect[i].size(); j++)
+        {
+            out << vect[i][j] << " ";
+        }
+        out << endl;
+    }
+    return out;
+}

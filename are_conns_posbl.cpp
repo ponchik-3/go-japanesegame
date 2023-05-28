@@ -53,7 +53,7 @@ void Player::are_connections_possible(Dot start, gboard & localboard)
     {
         for (int j = 0; j < wave[i].size(); j++)
         {
-            //wave[i][j].connection_possibility(localboard);
+            wave[i][j].connection_possibility(localboard);
         }
     }
 }

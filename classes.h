@@ -22,9 +22,11 @@ class Player
         
         bool operator == (Player another);
 
+        bool operator != (Player another);
+
         std::string putdot(gboard & board);
 
-        int wave_for_area(matr array_matrix, int xcrdnt, int ycrdnt, gboard localboard);
+        int wave_for_area(matr & array_matrix, int xcrdnt, int ycrdnt, gboard localboard);
         
         int get_area(gboard localboard);
 
@@ -34,9 +36,9 @@ class Player
 
         void are_connections_possible(Dot start, gboard & localboard);
 
-        void choose_dot(Dot preferred_one);
+        void choose_dot(gboard & board, Dot preferred_one);
 
-        int get_the_best_place(Dot opponent, int depth);
+        void get_the_best_place(Player & opponent, int depth, gboard & board);
 };
 
 class Dot
@@ -56,11 +58,11 @@ class Dot
 
         std::vector<Dot> get_accessible_neighbours(gboard localboard);
 
-        bool ist_an_der_grenze();
+        bool ist_an_der_grenze(int size);
 
-        bool are_on_same_side(Dot fellowdot);
+        bool are_on_same_side(Dot fellowdot, int size);
 
-        void connection_possibility(gboard localboard);
+        void connection_possibility(gboard & localboard);
 };
 
 

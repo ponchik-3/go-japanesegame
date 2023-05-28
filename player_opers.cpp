@@ -12,3 +12,15 @@ bool Player::operator == (Player another)
         return false;
     }
 }
+
+bool Player::operator != (Player another)
+{
+    if (this->colour == another.colour)
+    {
+        return false;
+    }
+    else
+    {
+        return true;
+    }
+}

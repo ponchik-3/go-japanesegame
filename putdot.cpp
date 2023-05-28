@@ -41,7 +41,7 @@ typedef std::vector<std::vector<Dot>> gboard;
 	return true;
 }*/
 
-std::string Player::putdot(gboard &board)
+std::string Player::putdot(gboard & board)
 {
 	std::string response;
 	int x;
@@ -97,7 +97,6 @@ std::string Player::putdot(gboard &board)
 		}*/
 		y = stoi(yinput);//as well as this function
 		
-		std::cout << check_for_position_acceptance(x, y, board) << std::endl;
 		while (check_for_position_acceptance(x, y, board) == false)
 		{
 			std::cout << "enter value following rules\n";
@@ -148,18 +147,43 @@ std::string Player::putdot(gboard &board)
 			y = stoi(yinput);
 		}
 
+		for (int i = 0; i < board.size(); i++)
+		{
+			for (int j = 0; j < board.size(); j++)
+			{
+				if (i == y && j == x)
+				{
+					std::cout << "x ";
+				}
+				else
+				{
+					if (board[j][i].team.colour == "")
+					{
+						std::cout << "' ";
+					}
+					else
+					{
+						std::cout << board[j][i].team.colour << " ";
+					}
+				}
+			}
+			std::cout << std::endl;
+		}
+
+
+
 		std::cout << "validate your dot\n";
-		std::cout << "if you are sure, type 'yes', else type '-'\n";
+		std::cout << "if you are sure, type 'y', else type '-'\n";
 		std::cout << "if you want to wuit the game, type 'quit'\n";
 		std::cin >> response;
 		if (response == "quit")
 		{
 			return "Болгаром будеш";
 		}
-		while (response != "yes" && response != "-")
+		while (response != "y" && response != "-")
 		{
-			std::cout << "you have to press 'enter' or type '-'\n";
-			std::cout << "if you are sure, type 'yes', else type '-'\n";
+			std::cout << "you have to type 'y' or type '-'\n";
+			std::cout << "if you are sure, type 'y', else type '-'\n";
 			std::cout << "if you want to wuit the game, type 'quit'\n";
 			std::cin >> response;
 		}
@@ -169,7 +193,25 @@ std::string Player::putdot(gboard &board)
 	board[x][y].team.colour = this->colour;
 	board[x][y].team.area = this->area;
 	this->are_connections_possible(board[x][y], board);
+
 	uint64_t end = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-	std::cout << "time spent: " << end - begin << std::endl;
+	std::cout << "time spent: " << (end - begin)/1000.0 << std::endl;
+
+	for (int i = 0; i < board.size(); i++)
+	{
+		for (int j = 0; j < board.size(); j++)
+		{
+			if (board[j][i].team.colour == "")
+			{
+				std::cout << "' ";
+			}
+			else
+			{
+				std::cout << board[j][i].team.colour << " ";
+			}
+		}
+		std::cout << std::endl;
+	}
+
 	return "ja ja arbeit arbeit";
 }
